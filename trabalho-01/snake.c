@@ -14,6 +14,10 @@
 // Constantes globais
 
 #define TAM_MAPA 200
+#define CIMA 0
+#define DIREITA 1
+#define BAIXO 2
+#define ESQUERDA 3
 
 /*
  * Estruturas para o jogo
@@ -47,6 +51,7 @@ void inicializaMapa(tMapa mapa);
 // Metodos referentes ao jogo
 
 tJogo iniciaJogo(int argc, char* path);
+int cabecaAtualDaCobra(tMapa mapa);
 
 // Funcao principal
 
@@ -133,4 +138,25 @@ tJogo iniciaJogo(int argc, char* path) {
     inicializaMapa(jogo.mapa);
 
     return jogo;
+}
+
+int cabecaAtualDaCobra(tMapa mapa) {
+    int i, j;
+    char obj;
+    for (i = 0; i < mapa.linhas; i++) {
+        for (j = 0; j < mapa.colunas; j++) {
+            obj = mapa.objs[i][j];
+            if (obj == '^') {
+                return CIMA;
+            } else if (obj == '>') {
+                return DIREITA;
+            } else if (obj == 'v') {
+                return BAIXO;
+            } else if (obj == '<') {
+                return ESQUERDA;
+            }
+        }
+    }
+
+    return -1;
 }
