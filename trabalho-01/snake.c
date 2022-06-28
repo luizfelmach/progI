@@ -17,10 +17,10 @@
 #define TAM_MAPA 200
 
 /*
- * Metodos para o tipo mapa
+ * Estruturas para o jogo
  *
- *      tMapa carregaMapa(char* path)
- *      void inicializaMapa(tMapa m)
+ *      tMapa -> Armazena os objetos do mapa
+ *      tJogo -> Armazena os tipos referentes ao jogo
  *
  */
 
@@ -30,8 +30,32 @@ typedef struct {
     int linhaInicial, colunaInicial;
 } tMapa;
 
+typedef struct {
+    tMapa mapa;
+    int pontuacao;
+    int comidas;
+    int tamanho;
+    int dinheiro;
+    int movimento;
+} tJogo;
+
+/*
+ * Metodos para o tipo mapa
+ *
+ *      tMapa carregaMapa(char* path)
+ *      void inicializaMapa(tMapa m)
+ *
+ */
+
 tMapa carregaMapa(char* path);
 void inicializaMapa(tMapa m);
+
+
+/*
+ * Metodos referentes ao jogo
+ *
+ */
+
 
 /*
  *
@@ -40,6 +64,7 @@ void inicializaMapa(tMapa m);
  */
 
 int main(int argc, char* argv[]) {
+    tJogo jogo;
     tMapa mapa;
     if (argc >= 2) {
         mapa = carregaMapa(argv[1]);
