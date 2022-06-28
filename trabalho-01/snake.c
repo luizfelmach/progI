@@ -6,13 +6,12 @@
  *
  */
 
+// Bibliotecas
+
 #include <stdio.h>
 #include <stdlib.h>
 
-/*
- * Constantes globais
- *
- */
+// Constantes globais
 
 #define TAM_MAPA 200
 
@@ -39,27 +38,17 @@ typedef struct {
     int movimento;
 } tJogo;
 
-/*
- * Metodos para o tipo mapa
- *
- */
+// Metodos para o tipo mapa
 
 tMapa carregaMapa(char* path);
 tMapa posicoesIniciais(tMapa mapa);
 void inicializaMapa(tMapa mapa);
 
-/*
- * Metodos referentes ao jogo
- *
- */
+// Metodos referentes ao jogo
 
 tJogo iniciaJogo(int argc, char* path);
 
-/*
- *
- * Funcao principal
- *
- */
+// Funcao principal
 
 int main(int argc, char* argv[]) {
     tJogo jogo = iniciaJogo(argc, argv[1]);
@@ -67,10 +56,7 @@ int main(int argc, char* argv[]) {
     return 0;
 }
 
-/*
- * Metodos para o tipo mapa
- *
- */
+// Metodos para o tipo mapa
 
 tMapa carregaMapa(char* path) {
     int i, j;
@@ -129,10 +115,7 @@ void inicializaMapa(tMapa mapa) {
     fclose(arquivo);
 }
 
-/*
- * Metodos referentes ao jogo
- *
- */
+// Metodos referentes ao jogo
 
 tJogo iniciaJogo(int argc, char* path) {
     tJogo jogo;
