@@ -61,7 +61,7 @@ int main(int argc, char* argv[]) {
 tMapa carregaMapa(char* path) {
     int i, j;
     char obj;
-    tMapa m;
+    tMapa mapa;
     FILE* arquivo = fopen(path, "r");
 
     if (!arquivo) {
@@ -69,19 +69,19 @@ tMapa carregaMapa(char* path) {
         exit(0);
     }
 
-    fscanf(arquivo, "%d %d", &m.linhas, &m.colunas);
+    fscanf(arquivo, "%d %d", &mapa.linhas, &mapa.colunas);
     fscanf(arquivo, "%*c");
 
-    for (i = 0; i < m.linhas; i++) {
-        for (j = 0; j < m.colunas; j++) {
+    for (i = 0; i < mapa.linhas; i++) {
+        for (j = 0; j < mapa.colunas; j++) {
             fscanf(arquivo, "%c", &obj);
-            m.objs[i][j] = obj;
+            mapa.objs[i][j] = obj;
         }
         fscanf(arquivo, "%*c");
     }
 
     fclose(arquivo);
-    return m;
+    return mapa;
 }
 
 tMapa posicoesIniciais(tMapa mapa) {
