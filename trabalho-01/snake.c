@@ -52,6 +52,7 @@ void inicializaMapa(tMapa mapa);
 
 tJogo iniciaJogo(int argc, char* path);
 int cabecaAtualDaCobra(tJogo jogo);
+int proximoMovimento(int mov, int cabecaAtual);
 
 // Funcao principal
 
@@ -145,7 +146,7 @@ int cabecaAtualDaCobra(tJogo jogo) {
     char obj;
     for (i = 0; i < jogo.mapa.linhas; i++) {
         for (j = 0; j < jogo.mapa.colunas; j++) {
-                obj = jogo.mapa.objs[i][j];
+            obj = jogo.mapa.objs[i][j];
             if (obj == '^') {
                 return CIMA;
             } else if (obj == '>') {
@@ -159,4 +160,25 @@ int cabecaAtualDaCobra(tJogo jogo) {
     }
 
     return -1;
+}
+
+int proximoMovimento(int mov, int cabecaAtual) {
+    if (mov == 'c') {
+        return cabecaAtual;
+    }
+    if (mov == 'h') {
+        cabecaAtual += 1;
+        if (cabecaAtual == 4) {
+            cabecaAtual = 0;
+        }
+    }
+
+    if (mov == 'a') {
+        cabecaAtual -= 1;
+        if (cabecaAtual == -1) {
+            cabecaAtual = 3;
+        }
+    }
+
+    return cabecaAtual;
 }
