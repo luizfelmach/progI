@@ -33,7 +33,7 @@ typedef struct {
 typedef struct {
     tMapa mapa;
     int pontuacao;
-    int comidas;
+    int comida;
     int tamanho;
     int dinheiro;
     int movimento;
@@ -42,20 +42,18 @@ typedef struct {
 /*
  * Metodos para o tipo mapa
  *
- *      tMapa carregaMapa(char* path)
- *      void inicializaMapa(tMapa m)
- *
  */
 
 tMapa carregaMapa(char* path);
-void inicializaMapa(tMapa m);
-
+tMapa posicoesIniciais(tMapa mapa);
+void inicializaMapa(tMapa mapa);
 
 /*
  * Metodos referentes ao jogo
  *
  */
 
+tJogo iniciaJogo(int argc, char* path);
 
 /*
  *
@@ -64,18 +62,7 @@ void inicializaMapa(tMapa m);
  */
 
 int main(int argc, char* argv[]) {
-    tJogo jogo;
-    tMapa mapa;
-    if (argc >= 2) {
-        mapa = carregaMapa(argv[1]);
-    } else {
-        printf(
-            "ERRO: O diretorio de arquivos de configuracao nao foi "
-            "informado\n");
-        exit(0);
-    }
-
-    inicializaMapa(mapa);
+    tJogo jogo = iniciaJogo(argc, argv[1]);
 
     return 0;
 }
@@ -111,24 +98,56 @@ tMapa carregaMapa(char* path) {
     return m;
 }
 
-void inicializaMapa(tMapa m) {
+tMapa posicoesIniciais(tMapa mapa) {
+    int i, j;
+    for (i = 0; i < mapa.linhas; i++) {
+        for (j = 0; j < mapa.colunas; j++) {
+            if (mapa.objs[i][j] == '>') {
+                mapa.linhaInicial = i;
+                mapa.colunaInicial = j;
+            }
+        }
+    }
+
+    return mapa;
+}
+
+void inicializaMapa(tMapa mapa) {
     int i, j;
     FILE* arquivo = fopen("inicializacao.txt", "w");
 
-    for (i = 0; i < m.linhas; i++) {
-        for (j = 0; j < m.colunas; j++) {
-            fprintf(arquivo, "%c", m.objs[i][j]);
-
-            if (m.objs[i][j] == '>') {
-                m.linhaInicial = i;
-                m.colunaInicial = j;
-            }
+    for (i = 0; i < mapa.linhas; i++) {
+        for (j = 0; j < mapa.colunas; j++) {
+            fprintf(arquivo, "%c", mapa.objs[i][j]);
         }
         fprintf(arquivo, "\n");
     }
 
     fprintf(arquivo, "A cobra comecara o jogo na linha %d e coluna %d\n",
-            m.linhaInicial + 1, m.colunaInicial + 1);
+            mapa.linhaInicial + 1, mapa.colunaInicial + 1);
 
     fclose(arquivo);
+}
+
+/*
+ * Metodos referentes ao jogo
+ *
+ */
+
+tJogo iniciaJogo(int argc, char* path) {
+    tJogo jogo;
+
+    if (argc == 1) {
+        printf(
+            "ERRO: O diretorio de arquivos de configuracao nao foi "
+            "informado\n");
+        exit(0);
+    }
+
+    jogo.mapa = carregaMapa(path);
+    jogo.mapa = posicoesIniciais(jogo.mapa);
+
+    inicializaMapa(jogo.mapa);
+
+    return jogo;
 }
