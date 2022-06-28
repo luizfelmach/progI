@@ -51,7 +51,7 @@ void inicializaMapa(tMapa mapa);
 // Metodos referentes ao jogo
 
 tJogo iniciaJogo(int argc, char* path);
-int cabecaAtualDaCobra(tMapa mapa);
+int cabecaAtualDaCobra(tJogo jogo);
 
 // Funcao principal
 
@@ -140,12 +140,12 @@ tJogo iniciaJogo(int argc, char* path) {
     return jogo;
 }
 
-int cabecaAtualDaCobra(tMapa mapa) {
+int cabecaAtualDaCobra(tJogo jogo) {
     int i, j;
     char obj;
-    for (i = 0; i < mapa.linhas; i++) {
-        for (j = 0; j < mapa.colunas; j++) {
-            obj = mapa.objs[i][j];
+    for (i = 0; i < jogo.mapa.linhas; i++) {
+        for (j = 0; j < jogo.mapa.colunas; j++) {
+                obj = jogo.mapa.objs[i][j];
             if (obj == '^') {
                 return CIMA;
             } else if (obj == '>') {
