@@ -20,15 +20,18 @@
  * Metodos para o tipo mapa
  *
  *      tMapa carregaMapa(char* path)
+ *      void inicializaMapa(tMapa m)
  *
  */
 
 typedef struct {
     char objs[TAM_MAPA][TAM_MAPA];
     int linhas, colunas;
+    int linhaInicial, colunaInicial;
 } tMapa;
 
 tMapa carregaMapa(char* path);
+void inicializaMapa(tMapa m);
 
 /*
  *
@@ -37,14 +40,18 @@ tMapa carregaMapa(char* path);
  */
 
 int main(int argc, char* argv[]) {
+    tMapa mapa;
     if (argc >= 2) {
-        carregaMapa(argv[1]);
+        mapa = carregaMapa(argv[1]);
     } else {
         printf(
             "ERRO: O diretorio de arquivos de configuracao nao foi "
             "informado\n");
         exit(0);
     }
+
+    inicializaMapa(mapa);
+
     return 0;
 }
 
@@ -64,7 +71,8 @@ tMapa carregaMapa(char* path) {
         exit(0);
     }
 
-    fscanf(arquivo, "%d %d\n", &m.linhas, &m.colunas);
+    fscanf(arquivo, "%d %d", &m.linhas, &m.colunas);
+    fscanf(arquivo, "%*c");
 
     for (i = 0; i < m.linhas; i++) {
         for (j = 0; j < m.colunas; j++) {
@@ -76,4 +84,26 @@ tMapa carregaMapa(char* path) {
 
     fclose(arquivo);
     return m;
+}
+
+void inicializaMapa(tMapa m) {
+    int i, j;
+    FILE* arquivo = fopen("inicializacao.txt", "w");
+
+    for (i = 0; i < m.linhas; i++) {
+        for (j = 0; j < m.colunas; j++) {
+            fprintf(arquivo, "%c", m.objs[i][j]);
+
+            if (m.objs[i][j] == '>') {
+                m.linhaInicial = i;
+                m.colunaInicial = j;
+            }
+        }
+        fprintf(arquivo, "\n");
+    }
+
+    fprintf(arquivo, "A cobra comecara o jogo na linha %d e coluna %d\n",
+            m.linhaInicial + 1, m.colunaInicial + 1);
+
+    fclose(arquivo);
 }
