@@ -35,11 +35,6 @@ typedef struct {
 
 typedef struct {
     tMapa mapa;
-    int pontuacao;
-    int comida;
-    int tamanho;
-    int dinheiro;
-    int movimento;
 } tJogo;
 
 // Metodos para o tipo mapa
@@ -53,12 +48,17 @@ void inicializaMapa(tMapa mapa);
 tJogo iniciaJogo(int argc, char* path);
 int cabecaAtualDaCobra(tJogo jogo);
 int proximoMovimento(int mov, int cabecaAtual);
+tJogo realizaMovimento(tJogo jogo, int mov);
 
 // Funcao principal
 
 int main(int argc, char* argv[]) {
     tJogo jogo = iniciaJogo(argc, argv[1]);
-
+    char mov;
+    while (scanf("%c", &mov) == 1) {
+        jogo = realizaMovimento(jogo, mov);
+        scanf("%*c");
+    }
     return 0;
 }
 
@@ -181,4 +181,9 @@ int proximoMovimento(int mov, int cabecaAtual) {
     }
 
     return cabecaAtual;
+}
+
+tJogo realizaMovimento(tJogo jogo, int mov) {
+
+    return jogo;
 }
