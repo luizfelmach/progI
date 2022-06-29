@@ -18,6 +18,7 @@
 #define DIREITA 1
 #define BAIXO 2
 #define ESQUERDA 3
+const int movimentos[4][2] = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
 
 /*
  * Estruturas para o jogo
@@ -39,6 +40,7 @@ typedef struct {
 // Metodos para o tipo mapa
 
 tMapa carregaMapa(char* path);
+int ehCabeca(char c);
 int linhaDaCabeca(tMapa mapa);
 int colunaDaCabeca(tMapa mapa);
 
@@ -103,11 +105,13 @@ tMapa carregaMapa(char* path) {
     return mapa;
 }
 
+int ehCabeca(char c) { return c == '^' || c == '>' || c == 'v' || c == '<'; }
+
 int linhaDaCabeca(tMapa mapa) {
     int i, j;
     for (i = 0; i < mapa.linhas; i++) {
         for (j = 0; j < mapa.colunas; j++) {
-            if (mapa.objs[i][j] == '>') {
+            if (ehCabeca(mapa.objs[i][j])) {
                 return i;
             }
         }
@@ -119,7 +123,7 @@ int colunaDaCabeca(tMapa mapa) {
     int i, j;
     for (i = 0; i < mapa.linhas; i++) {
         for (j = 0; j < mapa.colunas; j++) {
-            if (mapa.objs[i][j] == '>') {
+            if (ehCabeca(mapa.objs[i][j])) {
                 return j;
             }
         }
@@ -186,10 +190,7 @@ int proximoMovimento(int mov, int cabecaAtual) {
     return cabecaAtual;
 }
 
-tJogo realizaMovimento(tJogo jogo, int mov) {
-
-    return jogo;
-}
+tJogo realizaMovimento(tJogo jogo, int mov) { return jogo; }
 
 void geraInicializacao(tJogo jogo) {
     int i, j;
@@ -219,7 +220,6 @@ void geraResumo(tJogo jogo) {
 void geraRanking(tJogo jogo) {
     FILE* arquivo = fopen("ranking.txt", "w");
     fclose(arquivo);
-
 }
 
 void geraEstatistica(tJogo jogo) {
