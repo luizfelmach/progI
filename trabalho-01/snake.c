@@ -41,7 +41,6 @@ typedef struct {
 
 tMapa carregaMapa(char* path);
 tMapa posicoesIniciais(tMapa mapa);
-void inicializaMapa(tMapa mapa);
 
 // Metodos referentes ao jogo
 
@@ -49,6 +48,7 @@ tJogo iniciaJogo(int argc, char* path);
 int cabecaAtualDaCobra(tJogo jogo);
 int proximoMovimento(int mov, int cabecaAtual);
 tJogo realizaMovimento(tJogo jogo, int mov);
+void geraInicializacao(tJogo jogo);
 void geraResumo(tJogo jogo);
 void geraRanking(tJogo jogo);
 void geraEstatistica(tJogo jogo);
@@ -59,6 +59,8 @@ void geraHeatMapa(tJogo jogo);
 int main(int argc, char* argv[]) {
     tJogo jogo = iniciaJogo(argc, argv[1]);
     char mov;
+
+    geraInicializacao(jogo);
 
     while (scanf("%c", &mov) == 1) {
         jogo = realizaMovimento(jogo, mov);
@@ -115,23 +117,6 @@ tMapa posicoesIniciais(tMapa mapa) {
     return mapa;
 }
 
-void inicializaMapa(tMapa mapa) {
-    int i, j;
-    FILE* arquivo = fopen("inicializacao.txt", "w");
-
-    for (i = 0; i < mapa.linhas; i++) {
-        for (j = 0; j < mapa.colunas; j++) {
-            fprintf(arquivo, "%c", mapa.objs[i][j]);
-        }
-        fprintf(arquivo, "\n");
-    }
-
-    fprintf(arquivo, "A cobra comecara o jogo na linha %d e coluna %d\n",
-            mapa.linhaInicial + 1, mapa.colunaInicial + 1);
-
-    fclose(arquivo);
-}
-
 // Metodos referentes ao jogo
 
 tJogo iniciaJogo(int argc, char* path) {
@@ -146,8 +131,6 @@ tJogo iniciaJogo(int argc, char* path) {
 
     jogo.mapa = carregaMapa(path);
     jogo.mapa = posicoesIniciais(jogo.mapa);
-
-    inicializaMapa(jogo.mapa);
 
     return jogo;
 }
@@ -197,6 +180,23 @@ int proximoMovimento(int mov, int cabecaAtual) {
 tJogo realizaMovimento(tJogo jogo, int mov) {
 
     return jogo;
+}
+
+void geraInicializacao(tJogo jogo) {
+    int i, j;
+    FILE* arquivo = fopen("inicializacao.txt", "w");
+
+    for (i = 0; i < jogo.mapa.linhas; i++) {
+        for (j = 0; j < jogo.mapa.colunas; j++) {
+            fprintf(arquivo, "%c", jogo.mapa.objs[i][j]);
+        }
+        fprintf(arquivo, "\n");
+    }
+
+    fprintf(arquivo, "A cobra comecara o jogo na linha %d e coluna %d\n",
+            jogo.mapa.linhaInicial + 1, jogo.mapa.colunaInicial + 1);
+
+    fclose(arquivo);
 }
 
 void geraResumo(tJogo jogo) {
