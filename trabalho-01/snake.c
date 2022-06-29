@@ -30,7 +30,6 @@
 typedef struct {
     char objs[TAM_MAPA][TAM_MAPA];
     int linhas, colunas;
-    int linhaInicial, colunaInicial;
 } tMapa;
 
 typedef struct {
@@ -40,7 +39,8 @@ typedef struct {
 // Metodos para o tipo mapa
 
 tMapa carregaMapa(char* path);
-tMapa posicoesIniciais(tMapa mapa);
+int linhaDaCabeca(tMapa mapa);
+int colunaDaCabeca(tMapa mapa);
 
 // Metodos referentes ao jogo
 
@@ -103,18 +103,28 @@ tMapa carregaMapa(char* path) {
     return mapa;
 }
 
-tMapa posicoesIniciais(tMapa mapa) {
+int linhaDaCabeca(tMapa mapa) {
     int i, j;
     for (i = 0; i < mapa.linhas; i++) {
         for (j = 0; j < mapa.colunas; j++) {
             if (mapa.objs[i][j] == '>') {
-                mapa.linhaInicial = i;
-                mapa.colunaInicial = j;
+                return i;
             }
         }
     }
+    return -1;
+}
 
-    return mapa;
+int colunaDaCabeca(tMapa mapa) {
+    int i, j;
+    for (i = 0; i < mapa.linhas; i++) {
+        for (j = 0; j < mapa.colunas; j++) {
+            if (mapa.objs[i][j] == '>') {
+                return j;
+            }
+        }
+    }
+    return -1;
 }
 
 // Metodos referentes ao jogo
@@ -130,7 +140,6 @@ tJogo iniciaJogo(int argc, char* path) {
     }
 
     jogo.mapa = carregaMapa(path);
-    jogo.mapa = posicoesIniciais(jogo.mapa);
 
     return jogo;
 }
@@ -193,8 +202,11 @@ void geraInicializacao(tJogo jogo) {
         fprintf(arquivo, "\n");
     }
 
+    int cabecaL = linhaDaCabeca(jogo.mapa) + 1;
+    int cabecaC = colunaDaCabeca(jogo.mapa) + 1;
+
     fprintf(arquivo, "A cobra comecara o jogo na linha %d e coluna %d\n",
-            jogo.mapa.linhaInicial + 1, jogo.mapa.colunaInicial + 1);
+            cabecaL, cabecaC);
 
     fclose(arquivo);
 }
