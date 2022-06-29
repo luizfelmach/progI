@@ -49,16 +49,27 @@ tJogo iniciaJogo(int argc, char* path);
 int cabecaAtualDaCobra(tJogo jogo);
 int proximoMovimento(int mov, int cabecaAtual);
 tJogo realizaMovimento(tJogo jogo, int mov);
+void geraResumo(tJogo jogo);
+void geraRanking(tJogo jogo);
+void geraEstatistica(tJogo jogo);
+void geraHeatMapa(tJogo jogo);
 
 // Funcao principal
 
 int main(int argc, char* argv[]) {
     tJogo jogo = iniciaJogo(argc, argv[1]);
     char mov;
+
     while (scanf("%c", &mov) == 1) {
         jogo = realizaMovimento(jogo, mov);
         scanf("%*c");
     }
+
+    geraResumo(jogo);
+    geraRanking(jogo);
+    geraEstatistica(jogo);
+    geraHeatMapa(jogo);
+
     return 0;
 }
 
@@ -186,4 +197,25 @@ int proximoMovimento(int mov, int cabecaAtual) {
 tJogo realizaMovimento(tJogo jogo, int mov) {
 
     return jogo;
+}
+
+void geraResumo(tJogo jogo) {
+    FILE* arquivo = fopen("resumo.txt", "w");
+    fclose(arquivo);
+}
+
+void geraRanking(tJogo jogo) {
+    FILE* arquivo = fopen("ranking.txt", "w");
+    fclose(arquivo);
+
+}
+
+void geraEstatistica(tJogo jogo) {
+    FILE* arquivo = fopen("estatisticas.txt", "w");
+    fclose(arquivo);
+}
+
+void geraHeatMapa(tJogo jogo) {
+    FILE* arquivo = fopen("heat_map.txt", "w");
+    fclose(arquivo);
 }
