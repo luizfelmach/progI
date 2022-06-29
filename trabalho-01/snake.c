@@ -14,6 +14,10 @@
 // Constantes globais
 
 #define TAM_MAPA 200
+#define TAM_COBRA 200
+#define CABECA 0
+#define LINHA 0
+#define COLUNA 1
 #define CIMA 0
 #define DIREITA 1
 #define BAIXO 2
@@ -24,6 +28,7 @@ const int movimentos[4][2] = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
  * Estruturas para o jogo
  *
  *      tMapa -> Armazena os objetos do mapa
+ *      tCobra -> Armazena o tipo cobra
  *      tJogo -> Armazena os tipos referentes ao jogo
  *
  */
@@ -34,7 +39,13 @@ typedef struct {
 } tMapa;
 
 typedef struct {
+    int corpo[TAM_COBRA][2];
+    int tamanho;
+} tCobra;
+
+typedef struct {
     tMapa mapa;
+    tCobra cobra;
 } tJogo;
 
 // Metodos para o tipo mapa
@@ -43,6 +54,10 @@ tMapa carregaMapa(char* path);
 int ehCabeca(char c);
 int linhaDaCabeca(tMapa mapa);
 int colunaDaCabeca(tMapa mapa);
+
+// Metodos referentes a cobra
+
+tCobra inicializaCobra(int cabecaL, int cabecaC);
 
 // Metodos referentes ao jogo
 
@@ -105,7 +120,10 @@ tMapa carregaMapa(char* path) {
     return mapa;
 }
 
-int ehCabeca(char c) { return c == '^' || c == '>' || c == 'v' || c == '<'; }
+int ehCabeca(char c) {
+    int verificacao = c == '^' || c == '>' || c == 'v' || c == '<';
+    return verificacao;
+}
 
 int linhaDaCabeca(tMapa mapa) {
     int i, j;
@@ -131,6 +149,22 @@ int colunaDaCabeca(tMapa mapa) {
     return -1;
 }
 
+// Metodos referentes a cobra
+
+tCobra inicializaCobra(int cabecaL, int cabecaC) {
+    tCobra cobra;
+    cobra.tamanho = 1;
+    int i;
+    for (i = 0; i < TAM_COBRA; i++) {
+        cobra.corpo[i][LINHA] = -1;
+        cobra.corpo[i][COLUNA] = -1;
+    }
+    cobra.corpo[CABECA][LINHA] = cabecaL;
+    cobra.corpo[CABECA][COLUNA] = cabecaC;
+
+    return cobra;
+}
+
 // Metodos referentes ao jogo
 
 tJogo iniciaJogo(int argc, char* path) {
@@ -144,6 +178,9 @@ tJogo iniciaJogo(int argc, char* path) {
     }
 
     jogo.mapa = carregaMapa(path);
+    int cabecaL = linhaDaCabeca(jogo.mapa);
+    int cabecaC = colunaDaCabeca(jogo.mapa);
+    jogo.cobra = inicializaCobra(cabecaL, cabecaC);
 
     return jogo;
 }
@@ -203,8 +240,8 @@ void geraInicializacao(tJogo jogo) {
         fprintf(arquivo, "\n");
     }
 
-    int cabecaL = linhaDaCabeca(jogo.mapa) + 1;
-    int cabecaC = colunaDaCabeca(jogo.mapa) + 1;
+    int cabecaL = jogo.cobra.corpo[CABECA][LINHA] + 1;
+    int cabecaC = jogo.cobra.corpo[CABECA][COLUNA] + 1;
 
     fprintf(arquivo, "A cobra comecara o jogo na linha %d e coluna %d\n",
             cabecaL, cabecaC);
