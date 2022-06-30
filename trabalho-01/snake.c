@@ -22,6 +22,7 @@
 #define DIREITA 1
 #define BAIXO 2
 #define ESQUERDA 3
+#define VAZIO ' '
 #define PAREDE '#'
 #define COMIDA '*'
 #define DINHEIRO '$'
@@ -54,6 +55,7 @@ typedef struct {
 typedef struct {
     tMapa mapa;
     tCobra cobra;
+    int pontuacao;
 } tJogo;
 
 // Metodos para o tipo mapa
@@ -64,6 +66,7 @@ int linhaDaCabeca(tMapa mapa);
 int colunaDaCabeca(tMapa mapa);
 void imprimeMapa(tMapa mapa);
 tMapa atualizaMapa(tMapa mapa, tCobra cobra);
+char objetoDaCabeca(tMapa, tCobra);
 
 // Metodos referentes a cobra
 
@@ -73,7 +76,7 @@ tCobra movimentaCobra(tCobra cobra, int movimento);
 // Metodos referentes ao jogo
 
 tJogo iniciaJogo(int argc, char* path);
-int proximoMovimento(int mov, int direcaoDaCabeca);
+int proximaDirecao(int movimento, int direcaoDaCabeca);
 tJogo realizaMovimento(tJogo jogo, int movimento);
 void geraInicializacao(tJogo jogo);
 void geraResumo(tJogo jogo);
@@ -189,6 +192,15 @@ tMapa atualizaMapa(tMapa mapa, tCobra cobra) {
     return mapa;
 }
 
+char objetoDaCabeca(tMapa mapa, tCobra cobra) {
+    int cabeca[2] = {
+        cobra.corpo[CABECA][LINHA],
+        cobra.corpo[CABECA][COLUNA]
+    };
+    char objeto = mapa.objs[cabeca[LINHA]][cabeca[COLUNA]];
+    return objeto;
+}
+
 // Metodos referentes a cobra
 
 tCobra inicializaCobra(int cabecaL, int cabecaC) {
@@ -209,7 +221,10 @@ tCobra inicializaCobra(int cabecaL, int cabecaC) {
 tCobra movimentaCobra(tCobra cobra, int movimento) {
     int i, aux[2];
 
-    //Armazena a cauda ou uma parte do corpo anterior ate chegar na cauda
+    // Pega a nova direcao da cabeca de acordo com o movimento
+    movimento = proximaDirecao(movimento, cobra.direcao);
+
+    // Armazena a cauda ou uma parte do corpo anterior ate chegar na cauda
     int cauda[2] = {
         cobra.corpo[CABECA][LINHA],
         cobra.corpo[CABECA][COLUNA]
@@ -259,18 +274,18 @@ tJogo iniciaJogo(int argc, char* path) {
     return jogo;
 }
 
-int proximoMovimento(int mov, int direcaoDaCabeca) {
-    if (mov == 'c') {
+int proximaDirecao(int movimento, int direcaoDaCabeca) {
+    if (movimento == 'c') {
         return direcaoDaCabeca;
     }
-    if (mov == 'h') {
+    if (movimento == 'h') {
         direcaoDaCabeca += 1;
         if (direcaoDaCabeca == 4) {
             direcaoDaCabeca = 0;
         }
     }
 
-    if (mov == 'a') {
+    if (movimento == 'a') {
         direcaoDaCabeca -= 1;
         if (direcaoDaCabeca == -1) {
             direcaoDaCabeca = 3;
@@ -282,12 +297,30 @@ int proximoMovimento(int mov, int direcaoDaCabeca) {
 
 tJogo realizaMovimento(tJogo jogo, int movimento) {
 
-    int realMov = proximoMovimento(movimento, jogo.cobra.direcao);
-    jogo.cobra = movimentaCobra(jogo.cobra, realMov);
+    jogo.cobra = movimentaCobra(jogo.cobra, movimento);
+
+    char objeto = objetoDaCabeca(jogo.mapa, jogo.cobra);
+
+    if (objeto == PAREDE) {
+        exit(0);
+    }
+    if (objeto == COMIDA ) {
+        jogo.cobra.corpo[jogo.cobra.tamanho][LINHA] = jogo.cobra.cauda[LINHA];
+        jogo.cobra.corpo[jogo.cobra.tamanho][COLUNA] = jogo.cobra.cauda[COLUNA];
+        jogo.cobra.cauda[LINHA] = -1;
+        jogo.cobra.cauda[COLUNA] = -1;
+        jogo.cobra.tamanho++;
+        jogo.pontuacao++;
+    }
+    if (objeto == DINHEIRO) {
+        jogo.pontuacao += 10;
+    }
+
     jogo.mapa = atualizaMapa(jogo.mapa, jogo.cobra);
 
     printf("Estado do jogo apos o movimento '%c'\n", movimento);
     imprimeMapa(jogo.mapa);
+    printf("Pontuacao: %d\n", jogo.pontuacao);
     printf("\n");
     return jogo;
 }
