@@ -22,6 +22,10 @@
 #define DIREITA 1
 #define BAIXO 2
 #define ESQUERDA 3
+#define PAREDE '#'
+#define COMIDA '*'
+#define DINHEIRO '$'
+#define TUNEL '@'
 
 const char direcoes[4] = {'^', '>', 'v', '<'};
 const int movimentos[4][2] = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
@@ -81,12 +85,12 @@ void geraHeatMapa(tJogo jogo);
 
 int main(int argc, char* argv[]) {
     tJogo jogo = iniciaJogo(argc, argv[1]);
-    char mov;
+    char movimento;
 
     geraInicializacao(jogo);
 
-    while (scanf("%c", &mov) == 1) {
-        jogo = realizaMovimento(jogo, mov);
+    while (scanf("%c", &movimento) == 1) {
+        jogo = realizaMovimento(jogo, movimento);
         scanf("%*c");
     }
 
