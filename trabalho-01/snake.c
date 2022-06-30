@@ -22,6 +22,8 @@
 #define DIREITA 1
 #define BAIXO 2
 #define ESQUERDA 3
+
+const char direcoes[4] = {'^', '>', 'v', '<'};
 const int movimentos[4][2] = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
 
 /*
@@ -40,7 +42,9 @@ typedef struct {
 
 typedef struct {
     int corpo[TAM_COBRA][2];
+    int direcao;
     int tamanho;
+    int linhaDaCauda, colunaDaCauda;
 } tCobra;
 
 typedef struct {
@@ -54,16 +58,18 @@ tMapa carregaMapa(char* path);
 int ehCabeca(char c);
 int linhaDaCabeca(tMapa mapa);
 int colunaDaCabeca(tMapa mapa);
+void imprimeMapa(tMapa mapa);
+tMapa atualizaMapa(tMapa mapa, tCobra cobra);
 
 // Metodos referentes a cobra
 
 tCobra inicializaCobra(int cabecaL, int cabecaC);
+tCobra movimentaCobra(tCobra cobra, int mov);
 
 // Metodos referentes ao jogo
 
 tJogo iniciaJogo(int argc, char* path);
-int cabecaAtualDaCobra(tJogo jogo);
-int proximoMovimento(int mov, int cabecaAtual);
+int proximoMovimento(int mov, int direcaoDaCabeca);
 tJogo realizaMovimento(tJogo jogo, int mov);
 void geraInicializacao(tJogo jogo);
 void geraResumo(tJogo jogo);
@@ -149,11 +155,42 @@ int colunaDaCabeca(tMapa mapa) {
     return -1;
 }
 
+void imprimeMapa(tMapa mapa) {
+    int i, j;
+    for (i = 0; i < mapa.linhas; i++) {
+        for (j = 0; j < mapa.colunas; j++) {
+            printf("%c", mapa.objs[i][j]);
+        }
+        printf("\n");
+    }
+}
+
+tMapa atualizaMapa(tMapa mapa, tCobra cobra) {
+    int i, linha, coluna;
+    int linhaDaCauda = cobra.linhaDaCauda;
+    int colunaDaCauda = cobra.colunaDaCauda;
+    int l = cobra.corpo[CABECA][LINHA];
+    int c = cobra.corpo[CABECA][COLUNA];
+    for (i = 1; i < TAM_COBRA; i++) {
+        if (cobra.corpo[i][LINHA] != -1) {
+            linha = cobra.corpo[i][LINHA];
+            coluna = cobra.corpo[i][COLUNA];
+            mapa.objs[linha][coluna] = 'o';
+        }
+    }
+    if (linhaDaCauda != -1) {
+        mapa.objs[linhaDaCauda][colunaDaCauda] = ' ';
+    }
+    mapa.objs[l][c] = direcoes[cobra.direcao];
+    return mapa;
+}
+
 // Metodos referentes a cobra
 
 tCobra inicializaCobra(int cabecaL, int cabecaC) {
     tCobra cobra;
     cobra.tamanho = 1;
+    cobra.direcao = 1;
     int i;
     for (i = 0; i < TAM_COBRA; i++) {
         cobra.corpo[i][LINHA] = -1;
@@ -162,6 +199,29 @@ tCobra inicializaCobra(int cabecaL, int cabecaC) {
     cobra.corpo[CABECA][LINHA] = cabecaL;
     cobra.corpo[CABECA][COLUNA] = cabecaC;
 
+    return cobra;
+}
+
+tCobra movimentaCobra(tCobra cobra, int mov) {
+    int i;
+    int auxLinha, auxColuna;
+    int linhaAnterior = cobra.corpo[CABECA][LINHA];
+    int colunaAnterior = cobra.corpo[CABECA][COLUNA];
+    cobra.corpo[CABECA][LINHA] += movimentos[mov][LINHA];
+    cobra.corpo[CABECA][COLUNA] += movimentos[mov][COLUNA];
+    for (i = 1; i < TAM_COBRA; i++) {
+        if (cobra.corpo[i][LINHA] != -1) {
+            auxLinha = cobra.corpo[i][LINHA];
+            auxColuna = cobra.corpo[i][COLUNA];
+            cobra.corpo[i][LINHA] = linhaAnterior;
+            cobra.corpo[i][COLUNA] = colunaAnterior;
+            linhaAnterior = auxLinha;
+            colunaAnterior = auxColuna;
+        }
+    }
+    cobra.linhaDaCauda = linhaAnterior;
+    cobra.colunaDaCauda = colunaAnterior;
+    cobra.direcao = mov;
     return cobra;
 }
 
@@ -185,49 +245,38 @@ tJogo iniciaJogo(int argc, char* path) {
     return jogo;
 }
 
-int cabecaAtualDaCobra(tJogo jogo) {
-    int i, j;
-    char obj;
-    for (i = 0; i < jogo.mapa.linhas; i++) {
-        for (j = 0; j < jogo.mapa.colunas; j++) {
-            obj = jogo.mapa.objs[i][j];
-            if (obj == '^') {
-                return CIMA;
-            } else if (obj == '>') {
-                return DIREITA;
-            } else if (obj == 'v') {
-                return BAIXO;
-            } else if (obj == '<') {
-                return ESQUERDA;
-            }
-        }
-    }
-
-    return -1;
-}
-
-int proximoMovimento(int mov, int cabecaAtual) {
+int proximoMovimento(int mov, int direcaoDaCabeca) {
     if (mov == 'c') {
-        return cabecaAtual;
+        return direcaoDaCabeca;
     }
     if (mov == 'h') {
-        cabecaAtual += 1;
-        if (cabecaAtual == 4) {
-            cabecaAtual = 0;
+        direcaoDaCabeca += 1;
+        if (direcaoDaCabeca == 4) {
+            direcaoDaCabeca = 0;
         }
     }
 
     if (mov == 'a') {
-        cabecaAtual -= 1;
-        if (cabecaAtual == -1) {
-            cabecaAtual = 3;
+        direcaoDaCabeca -= 1;
+        if (direcaoDaCabeca == -1) {
+            direcaoDaCabeca = 3;
         }
     }
 
-    return cabecaAtual;
+    return direcaoDaCabeca;
 }
 
-tJogo realizaMovimento(tJogo jogo, int mov) { return jogo; }
+tJogo realizaMovimento(tJogo jogo, int mov) {
+
+    int realMov = proximoMovimento(mov, jogo.cobra.direcao);
+    jogo.cobra = movimentaCobra(jogo.cobra, realMov);
+    jogo.mapa = atualizaMapa(jogo.mapa, jogo.cobra);
+
+    printf("Estado do jogo apos o movimento '%c'\n", mov);
+    imprimeMapa(jogo.mapa);
+    printf("\n");
+    return jogo;
+}
 
 void geraInicializacao(tJogo jogo) {
     int i, j;
