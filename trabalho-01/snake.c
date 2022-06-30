@@ -67,17 +67,26 @@ int colunaDaCabeca(tMapa mapa);
 void imprimeMapa(tMapa mapa);
 tMapa atualizaMapa(tMapa mapa, tCobra cobra);
 char objetoDaCabeca(tMapa, tCobra);
+int temComida(tMapa mapa);
 
 // Metodos referentes a cobra
 
 tCobra inicializaCobra(int cabecaL, int cabecaC);
 tCobra movimentaCobra(tCobra cobra, int movimento);
+tCobra aumentaCobra(tCobra cobra);
+int colisaoComACobra(tCobra cobra);
+int passouDoMapa(tMapa mapa, tCobra cobra);
+tCobra teleportaCobra(tMapa mapa, tCobra cobra);
 
 // Metodos referentes ao jogo
 
 tJogo iniciaJogo(int argc, char* path);
+tJogo aumentaPontuacao(tJogo jogo, int quantidade);
 int proximaDirecao(int movimento, int direcaoDaCabeca);
 tJogo realizaMovimento(tJogo jogo, int movimento);
+void perdeJogo(tJogo jogo);
+void venceJogo(tJogo jogo);
+void estadoAtual(tJogo jogo, int movimento);
 void geraInicializacao(tJogo jogo);
 void geraResumo(tJogo jogo);
 void geraRanking(tJogo jogo);
@@ -193,12 +202,22 @@ tMapa atualizaMapa(tMapa mapa, tCobra cobra) {
 }
 
 char objetoDaCabeca(tMapa mapa, tCobra cobra) {
-    int cabeca[2] = {
-        cobra.corpo[CABECA][LINHA],
-        cobra.corpo[CABECA][COLUNA]
-    };
+    int cabeca[2] = {cobra.corpo[CABECA][LINHA], cobra.corpo[CABECA][COLUNA]};
     char objeto = mapa.objs[cabeca[LINHA]][cabeca[COLUNA]];
     return objeto;
+}
+
+int temComida(tMapa mapa) {
+    int i, j;
+    int quantidadeDeComida = 0;
+    for (i = 0; i < mapa.linhas; i++) {
+        for (j = 0; j < mapa.colunas; j++) {
+            if (mapa.objs[i][j] == COMIDA) {
+                quantidadeDeComida++;
+            }
+        }
+    }
+    return quantidadeDeComida;
 }
 
 // Metodos referentes a cobra
@@ -225,10 +244,7 @@ tCobra movimentaCobra(tCobra cobra, int movimento) {
     movimento = proximaDirecao(movimento, cobra.direcao);
 
     // Armazena a cauda ou uma parte do corpo anterior ate chegar na cauda
-    int cauda[2] = {
-        cobra.corpo[CABECA][LINHA],
-        cobra.corpo[CABECA][COLUNA]
-    };
+    int cauda[2] = {cobra.corpo[CABECA][LINHA], cobra.corpo[CABECA][COLUNA]};
 
     // Faz o movimento da cabeca da cobra
     cobra.corpo[CABECA][LINHA] += movimentos[movimento][LINHA];
@@ -254,6 +270,66 @@ tCobra movimentaCobra(tCobra cobra, int movimento) {
     return cobra;
 }
 
+tCobra aumentaCobra(tCobra cobra) {
+    // Adiciona um corpo na cauda
+    cobra.corpo[cobra.tamanho][LINHA] = cobra.cauda[LINHA];
+    cobra.corpo[cobra.tamanho][COLUNA] = cobra.cauda[COLUNA];
+
+    // Coloca a cauda como inexistente e aumenta o tamanho
+    cobra.cauda[LINHA] = -1;
+    cobra.cauda[COLUNA] = -1;
+    cobra.tamanho++;
+    return cobra;
+}
+
+int colisaoComACobra(tCobra cobra) {
+    int colisao = 0, i;
+
+    int cabeca[2] = {cobra.corpo[CABECA][LINHA], cobra.corpo[CABECA][COLUNA]};
+
+    for (i = 1; i < TAM_COBRA; i++) {
+        if (cobra.corpo[i][LINHA] == cabeca[LINHA] &&
+            cobra.corpo[i][COLUNA] == cabeca[COLUNA]) {
+            return 1;
+        }
+    }
+
+    return colisao;
+}
+
+int passouDoMapa(tMapa mapa, tCobra cobra) {
+    int passouDoMapa = 0;
+    int cabeca[2] = {cobra.corpo[CABECA][LINHA], cobra.corpo[CABECA][COLUNA]};
+
+    if (cabeca[LINHA] < 0 || cabeca[COLUNA] < 0) {
+        return 1;
+    }
+    if (cabeca[LINHA] >= mapa.linhas || cabeca[COLUNA] >= mapa.colunas) {
+        return 1;
+    }
+
+    return passouDoMapa;
+}
+
+tCobra teleportaCobra(tMapa mapa, tCobra cobra) {
+    int cabeca[2] = {cobra.corpo[CABECA][LINHA], cobra.corpo[CABECA][COLUNA]};
+
+    if (cabeca[LINHA] < 0) {
+        cobra.corpo[CABECA][LINHA] = mapa.linhas - 1;
+    }
+    if (cabeca[COLUNA] < 0) {
+        cobra.corpo[CABECA][COLUNA] = mapa.colunas - 1;
+    }
+    if (cabeca[LINHA] >= mapa.linhas) {
+        cobra.corpo[CABECA][LINHA] = 0;
+    }
+    if (cabeca[COLUNA] >= mapa.colunas) {
+        cobra.corpo[CABECA][COLUNA] = 0;
+    }
+
+    return cobra;
+}
+
 // Metodos referentes ao jogo
 
 tJogo iniciaJogo(int argc, char* path) {
@@ -271,6 +347,11 @@ tJogo iniciaJogo(int argc, char* path) {
     int cabecaC = colunaDaCabeca(jogo.mapa);
     jogo.cobra = inicializaCobra(cabecaL, cabecaC);
 
+    return jogo;
+}
+
+tJogo aumentaPontuacao(tJogo jogo, int quantidade) {
+    jogo.pontuacao += quantidade;
     return jogo;
 }
 
@@ -296,33 +377,51 @@ int proximaDirecao(int movimento, int direcaoDaCabeca) {
 }
 
 tJogo realizaMovimento(tJogo jogo, int movimento) {
-
     jogo.cobra = movimentaCobra(jogo.cobra, movimento);
+
+    if (passouDoMapa(jogo.mapa, jogo.cobra)) {
+        jogo.cobra = teleportaCobra(jogo.mapa, jogo.cobra);
+    }
 
     char objeto = objetoDaCabeca(jogo.mapa, jogo.cobra);
 
-    if (objeto == PAREDE) {
+    if (objeto == PAREDE || colisaoComACobra(jogo.cobra)) {
+        perdeJogo(jogo);
         exit(0);
     }
-    if (objeto == COMIDA ) {
-        jogo.cobra.corpo[jogo.cobra.tamanho][LINHA] = jogo.cobra.cauda[LINHA];
-        jogo.cobra.corpo[jogo.cobra.tamanho][COLUNA] = jogo.cobra.cauda[COLUNA];
-        jogo.cobra.cauda[LINHA] = -1;
-        jogo.cobra.cauda[COLUNA] = -1;
-        jogo.cobra.tamanho++;
-        jogo.pontuacao++;
+    if (objeto == COMIDA) {
+        jogo.cobra = aumentaCobra(jogo.cobra);
+        jogo = aumentaPontuacao(jogo, 1);
     }
     if (objeto == DINHEIRO) {
-        jogo.pontuacao += 10;
+        jogo = aumentaPontuacao(jogo, 10);
     }
 
     jogo.mapa = atualizaMapa(jogo.mapa, jogo.cobra);
 
-    printf("Estado do jogo apos o movimento '%c'\n", movimento);
+    estadoAtual(jogo, movimento);
+
+    if (!temComida(jogo.mapa)) {
+        venceJogo(jogo);
+    }
+    return jogo;
+}
+
+void perdeJogo(tJogo jogo) {
+    printf("Game over!\n");
+    printf("Pontuacao final: %d", jogo.pontuacao);
+}
+
+void venceJogo(tJogo jogo) {
+    printf("Voce venceu!\n");
+    printf("Pontuacao final: %d", jogo.pontuacao);
+}
+
+void estadoAtual(tJogo jogo, int movimento) {
+    printf("Estado do jogo apos o movimento '%c':\n", movimento);
     imprimeMapa(jogo.mapa);
     printf("Pontuacao: %d\n", jogo.pontuacao);
     printf("\n");
-    return jogo;
 }
 
 void geraInicializacao(tJogo jogo) {
