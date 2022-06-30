@@ -40,6 +40,7 @@ const int movimentos[4][2] = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
  * Estruturas para o jogo
  *
  *      tMapa -> Armazena os objetos do mapa
+ *      tHeatMapa -> Armazena o tipo HeatMapa
  *      tCobra -> Armazena o tipo cobra
  *      tJogo -> Armazena os tipos referentes ao jogo
  *
@@ -51,6 +52,11 @@ typedef struct {
 } tMapa;
 
 typedef struct {
+    char objs[TAM_MAPA][TAM_MAPA];
+    int linhas, colunas;
+} tHeatMapa;
+
+typedef struct {
     int corpo[TAM_COBRA][2];
     int cauda[2];
     int direcao;
@@ -59,6 +65,7 @@ typedef struct {
 
 typedef struct {
     tMapa mapa;
+    tHeatMapa heatMapa;
     tCobra cobra;
     int pontuacao;
     int status;
@@ -76,6 +83,11 @@ void imprimeMapaCobraMorta(tMapa mapa);
 tMapa atualizaMapa(tMapa mapa, tCobra cobra);
 char objetoDaCabeca(tMapa, tCobra);
 int temComida(tMapa mapa);
+
+// Metodos para o tipo heatMapa
+
+tHeatMapa inicializaHeatMapa(char* path);
+tHeatMapa rastreiaMovimento(tHeatMapa heatMapa, tCobra cobra);
 
 // Metodos referentes a cobra
 
@@ -281,6 +293,41 @@ int temComida(tMapa mapa) {
     return quantidadeDeComida;
 }
 
+// Metodos para o tipo heatMapa
+
+tHeatMapa inicializaHeatMapa(char* path) {
+    int i, j;
+    tHeatMapa heatMapa;
+    FILE* arquivo = fopen(path, "r");
+
+    // Verifica se o arquivo existe
+    if (!arquivo) {
+        printf("Nao foi possivel ler o arquivo %s\n", path);
+        exit(0);
+    }
+
+    // Le as dimensoes do mapa
+    fscanf(arquivo, "%d %d", &heatMapa.linhas, &heatMapa.colunas);
+
+    // Zera todos os valores do mapa
+    for (i = 0; i < heatMapa.linhas; i++) {
+        for (j = 0; j < heatMapa.colunas; j++) {
+            heatMapa.objs[i][j] = 0;
+        }
+    }
+
+    fclose(arquivo);
+    return heatMapa;
+}
+
+tHeatMapa rastreiaMovimento(tHeatMapa heatMapa, tCobra cobra) {
+    // Pega as coordenadas da cabeca da cobra
+    int cabeca[2] = {cobra.corpo[CABECA][LINHA], cobra.corpo[CABECA][COLUNA]};
+    heatMapa.objs[cabeca[LINHA]][cabeca[COLUNA]] += 1;
+
+    return heatMapa;
+}
+
 // Metodos referentes a cobra
 
 tCobra inicializaCobra(tMapa mapa) {
@@ -290,12 +337,10 @@ tCobra inicializaCobra(tMapa mapa) {
     int cabecaL = linhaDaCabeca(mapa);
     int cabecaC = colunaDaCabeca(mapa);
 
-    // Inicializa cobra com tamanho 1, direcao para direita e as coordenadas da cabeca
+    // Inicializa cobra com tamanho 1, direcao para direita e as coordenadas da
+    // cabeca
     tCobra cobra = {
-        .tamanho = 1,
-        .direcao = DIREITA,
-        .corpo[0] = {cabecaL, cabecaC}
-    };
+        .tamanho = 1, .direcao = DIREITA, .corpo[0] = {cabecaL, cabecaC}};
 
     // Define o resto do corpo como inexistente
     for (i = 1; i < TAM_COBRA; i++) {
@@ -340,7 +385,6 @@ tCobra movimentaCobra(tCobra cobra, int movimento) {
 }
 
 tCobra aumentaCobra(tCobra cobra) {
-
     // Adiciona um corpo na cauda
     cobra.corpo[cobra.tamanho][LINHA] = cobra.cauda[LINHA];
     cobra.corpo[cobra.tamanho][COLUNA] = cobra.cauda[COLUNA];
@@ -371,7 +415,6 @@ int colisaoComACobra(tCobra cobra) {
 }
 
 int passouDoMapa(tMapa mapa, tCobra cobra) {
-
     // Pega as coordenadas da cabeca
     int cabeca[2] = {cobra.corpo[CABECA][LINHA], cobra.corpo[CABECA][COLUNA]};
 
@@ -387,7 +430,6 @@ int passouDoMapa(tMapa mapa, tCobra cobra) {
 }
 
 tCobra teleportaCobra(tMapa mapa, tCobra cobra) {
-
     // Pega as coordenadas da cabeca
     int cabeca[2] = {cobra.corpo[CABECA][LINHA], cobra.corpo[CABECA][COLUNA]};
 
@@ -411,7 +453,6 @@ tCobra teleportaCobra(tMapa mapa, tCobra cobra) {
 // Metodos referentes ao jogo
 
 tJogo iniciaJogo(int argc, char* path) {
-
     // Verifica se foi passado um arquivo
     if (argc == 1) {
         printf(
@@ -421,12 +462,11 @@ tJogo iniciaJogo(int argc, char* path) {
     }
 
     // Inicia o jogo com as variaveis resetadas
-    tJogo jogo = {
-        .mapa = carregaMapa(path),
-        .cobra = inicializaCobra(jogo.mapa),
-        .pontuacao = 0,
-        .status = JOGANDO
-    };
+    tJogo jogo = {.mapa = carregaMapa(path),
+                  .heatMapa = inicializaHeatMapa(path),
+                  .cobra = inicializaCobra(jogo.mapa),
+                  .pontuacao = 0,
+                  .status = JOGANDO};
 
     return jogo;
 }
@@ -458,6 +498,7 @@ int proximaDirecao(int movimento, int direcaoDaCabeca) {
 }
 
 tJogo realizaMovimento(tJogo jogo, int movimento) {
+    jogo.heatMapa = rastreiaMovimento(jogo.heatMapa, jogo.cobra);
     jogo.cobra = movimentaCobra(jogo.cobra, movimento);
 
     if (passouDoMapa(jogo.mapa, jogo.cobra)) {
@@ -468,6 +509,7 @@ tJogo realizaMovimento(tJogo jogo, int movimento) {
 
     if (objeto == PAREDE || colisaoComACobra(jogo.cobra)) {
         jogo.status = PERDEU;
+        jogo.heatMapa = rastreiaMovimento(jogo.heatMapa, jogo.cobra);
     }
     if (objeto == COMIDA) {
         jogo.cobra = aumentaCobra(jogo.cobra);
@@ -481,6 +523,7 @@ tJogo realizaMovimento(tJogo jogo, int movimento) {
 
     if (!temComida(jogo.mapa)) {
         jogo.status = VENCEU;
+        jogo.heatMapa = rastreiaMovimento(jogo.heatMapa, jogo.cobra);
     }
 
     estadoAtual(jogo, movimento);
@@ -554,6 +597,18 @@ void geraEstatistica(tJogo jogo) {
 }
 
 void geraHeatMapa(tJogo jogo) {
-    FILE* arquivo = fopen("heat_map.txt", "w");
+    int i, j;
+    FILE* arquivo = fopen("heatmap.txt", "w");
+
+    for (i = 0; i < jogo.heatMapa.linhas; i++) {
+        for (j = 0; j < jogo.heatMapa.colunas; j++) {
+            fprintf(arquivo, "%d", jogo.heatMapa.objs[i][j]);
+            if (j < jogo.heatMapa.colunas - 1) {
+                fprintf(arquivo, " ");
+            }
+        }
+        fprintf(arquivo, "\n");
+    }
+
     fclose(arquivo);
 }
