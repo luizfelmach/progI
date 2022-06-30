@@ -122,14 +122,17 @@ tMapa carregaMapa(char* path) {
     tMapa mapa;
     FILE* arquivo = fopen(path, "r");
 
+    // Verifica se o arquivo existe
     if (!arquivo) {
         printf("Nao foi possivel ler o arquivo %s\n", path);
         exit(0);
     }
 
+    // Le as dimensoes do mapa
     fscanf(arquivo, "%d %d", &mapa.linhas, &mapa.colunas);
     fscanf(arquivo, "%*c");
 
+    // Carrega o mapa para a estrutura
     for (i = 0; i < mapa.linhas; i++) {
         for (j = 0; j < mapa.colunas; j++) {
             fscanf(arquivo, "%c", &obj);
@@ -149,6 +152,8 @@ int ehCabeca(char c) {
 
 int linhaDaCabeca(tMapa mapa) {
     int i, j;
+
+    // Percorre o mapa para achar a cabeca e retorna a linha
     for (i = 0; i < mapa.linhas; i++) {
         for (j = 0; j < mapa.colunas; j++) {
             if (ehCabeca(mapa.objs[i][j])) {
@@ -156,11 +161,14 @@ int linhaDaCabeca(tMapa mapa) {
             }
         }
     }
+
     return -1;
 }
 
 int colunaDaCabeca(tMapa mapa) {
     int i, j;
+
+    // Percorre o mapa para achar a cabeca e retorna a coluna
     for (i = 0; i < mapa.linhas; i++) {
         for (j = 0; j < mapa.colunas; j++) {
             if (ehCabeca(mapa.objs[i][j])) {
@@ -168,11 +176,14 @@ int colunaDaCabeca(tMapa mapa) {
             }
         }
     }
+
     return -1;
 }
 
 void imprimeMapa(tMapa mapa) {
     int i, j;
+
+    // Percorre e imprime o mapa
     for (i = 0; i < mapa.linhas; i++) {
         for (j = 0; j < mapa.colunas; j++) {
             printf("%c", mapa.objs[i][j]);
@@ -183,10 +194,15 @@ void imprimeMapa(tMapa mapa) {
 
 tMapa atualizaMapa(tMapa mapa, tCobra cobra) {
     int i, linha, coluna;
-    int linhaDaCauda = cobra.cauda[LINHA];
-    int colunaDaCauda = cobra.cauda[COLUNA];
+
+    // Pega a cauda da cobra
+    int cauda[2] = {cobra.cauda[LINHA], cobra.cauda[COLUNA]};
+
+    // Pega a coordenada da cabeca
     int l = cobra.corpo[CABECA][LINHA];
     int c = cobra.corpo[CABECA][COLUNA];
+
+    // Atualiza o corpo para onde estava a cabeca
     for (i = 1; i < TAM_COBRA; i++) {
         if (cobra.corpo[i][LINHA] != -1) {
             linha = cobra.corpo[i][LINHA];
@@ -194,15 +210,23 @@ tMapa atualizaMapa(tMapa mapa, tCobra cobra) {
             mapa.objs[linha][coluna] = 'o';
         }
     }
-    if (linhaDaCauda != -1) {
-        mapa.objs[linhaDaCauda][colunaDaCauda] = ' ';
+
+    // Se a cauda existir, apague
+    if (cauda[LINHA] != -1) {
+        mapa.objs[cauda[LINHA]][cauda[COLUNA]] = ' ';
     }
+
+    // Atualiza a direcao da cabeca
     mapa.objs[l][c] = direcoes[cobra.direcao];
+
     return mapa;
 }
 
 char objetoDaCabeca(tMapa mapa, tCobra cobra) {
+    // Pega as coordenadas da cabeca
     int cabeca[2] = {cobra.corpo[CABECA][LINHA], cobra.corpo[CABECA][COLUNA]};
+
+    // Retorna o objeto da cabeca
     char objeto = mapa.objs[cabeca[LINHA]][cabeca[COLUNA]];
     return objeto;
 }
@@ -210,6 +234,8 @@ char objetoDaCabeca(tMapa mapa, tCobra cobra) {
 int temComida(tMapa mapa) {
     int i, j;
     int quantidadeDeComida = 0;
+
+    // Percorre o mapa retorna a quantidade de comida
     for (i = 0; i < mapa.linhas; i++) {
         for (j = 0; j < mapa.colunas; j++) {
             if (mapa.objs[i][j] == COMIDA) {
@@ -217,6 +243,7 @@ int temComida(tMapa mapa) {
             }
         }
     }
+
     return quantidadeDeComida;
 }
 
