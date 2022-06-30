@@ -71,7 +71,7 @@ int temComida(tMapa mapa);
 
 // Metodos referentes a cobra
 
-tCobra inicializaCobra(int cabecaL, int cabecaC);
+tCobra inicializaCobra(tMapa mapa);
 tCobra movimentaCobra(tCobra cobra, int movimento);
 tCobra aumentaCobra(tCobra cobra);
 int colisaoComACobra(tCobra cobra);
@@ -249,17 +249,25 @@ int temComida(tMapa mapa) {
 
 // Metodos referentes a cobra
 
-tCobra inicializaCobra(int cabecaL, int cabecaC) {
-    tCobra cobra;
-    cobra.tamanho = 1;
-    cobra.direcao = 1;
+tCobra inicializaCobra(tMapa mapa) {
     int i;
-    for (i = 0; i < TAM_COBRA; i++) {
+
+    // Coordenadas da cabeca
+    int cabecaL = linhaDaCabeca(mapa);
+    int cabecaC = colunaDaCabeca(mapa);
+
+    // Inicializa cobra com tamanho 1, direcao para direita e as coordenadas da cabeca
+    tCobra cobra = {
+        .tamanho = 1,
+        .direcao = DIREITA,
+        .corpo[0] = {cabecaL, cabecaC}
+    };
+
+    // Define o resto do corpo como inexistente
+    for (i = 1; i < TAM_COBRA; i++) {
         cobra.corpo[i][LINHA] = -1;
         cobra.corpo[i][COLUNA] = -1;
     }
-    cobra.corpo[CABECA][LINHA] = cabecaL;
-    cobra.corpo[CABECA][COLUNA] = cabecaC;
 
     return cobra;
 }
@@ -289,7 +297,7 @@ tCobra movimentaCobra(tCobra cobra, int movimento) {
         }
     }
 
-    // Armazena a cauda e a ultima direcao
+    // Atualiza a cauda e a ultima direcao
     cobra.cauda[LINHA] = cauda[LINHA];
     cobra.cauda[COLUNA] = cauda[COLUNA];
     cobra.direcao = movimento;
@@ -298,6 +306,7 @@ tCobra movimentaCobra(tCobra cobra, int movimento) {
 }
 
 tCobra aumentaCobra(tCobra cobra) {
+
     // Adiciona um corpo na cauda
     cobra.corpo[cobra.tamanho][LINHA] = cobra.cauda[LINHA];
     cobra.corpo[cobra.tamanho][COLUNA] = cobra.cauda[COLUNA];
@@ -306,14 +315,17 @@ tCobra aumentaCobra(tCobra cobra) {
     cobra.cauda[LINHA] = -1;
     cobra.cauda[COLUNA] = -1;
     cobra.tamanho++;
+
     return cobra;
 }
 
 int colisaoComACobra(tCobra cobra) {
     int colisao = 0, i;
 
+    // Pega as coordenadas da cabeca
     int cabeca[2] = {cobra.corpo[CABECA][LINHA], cobra.corpo[CABECA][COLUNA]};
 
+    // Percorre o corpo e ve se a cabeca colidiu com algun deles
     for (i = 1; i < TAM_COBRA; i++) {
         if (cobra.corpo[i][LINHA] == cabeca[LINHA] &&
             cobra.corpo[i][COLUNA] == cabeca[COLUNA]) {
@@ -325,9 +337,11 @@ int colisaoComACobra(tCobra cobra) {
 }
 
 int passouDoMapa(tMapa mapa, tCobra cobra) {
-    int passouDoMapa = 0;
+
+    // Pega as coordenadas da cabeca
     int cabeca[2] = {cobra.corpo[CABECA][LINHA], cobra.corpo[CABECA][COLUNA]};
 
+    // Retorna verdadeiro caso tenha passado do mapa
     if (cabeca[LINHA] < 0 || cabeca[COLUNA] < 0) {
         return 1;
     }
@@ -335,12 +349,15 @@ int passouDoMapa(tMapa mapa, tCobra cobra) {
         return 1;
     }
 
-    return passouDoMapa;
+    return 0;
 }
 
 tCobra teleportaCobra(tMapa mapa, tCobra cobra) {
+
+    // Pega as coordenadas da cabeca
     int cabeca[2] = {cobra.corpo[CABECA][LINHA], cobra.corpo[CABECA][COLUNA]};
 
+    // Teleporta a cabeca da cobra para o outro lado do mapa
     if (cabeca[LINHA] < 0) {
         cobra.corpo[CABECA][LINHA] = mapa.linhas - 1;
     }
@@ -370,9 +387,7 @@ tJogo iniciaJogo(int argc, char* path) {
     }
 
     jogo.mapa = carregaMapa(path);
-    int cabecaL = linhaDaCabeca(jogo.mapa);
-    int cabecaC = colunaDaCabeca(jogo.mapa);
-    jogo.cobra = inicializaCobra(cabecaL, cabecaC);
+    jogo.cobra = inicializaCobra(jogo.mapa);
 
     return jogo;
 }
