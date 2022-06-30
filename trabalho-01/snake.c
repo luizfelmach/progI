@@ -64,13 +64,13 @@ tMapa atualizaMapa(tMapa mapa, tCobra cobra);
 // Metodos referentes a cobra
 
 tCobra inicializaCobra(int cabecaL, int cabecaC);
-tCobra movimentaCobra(tCobra cobra, int mov);
+tCobra movimentaCobra(tCobra cobra, int movimento);
 
 // Metodos referentes ao jogo
 
 tJogo iniciaJogo(int argc, char* path);
 int proximoMovimento(int mov, int direcaoDaCabeca);
-tJogo realizaMovimento(tJogo jogo, int mov);
+tJogo realizaMovimento(tJogo jogo, int movimento);
 void geraInicializacao(tJogo jogo);
 void geraResumo(tJogo jogo);
 void geraRanking(tJogo jogo);
@@ -202,13 +202,13 @@ tCobra inicializaCobra(int cabecaL, int cabecaC) {
     return cobra;
 }
 
-tCobra movimentaCobra(tCobra cobra, int mov) {
+tCobra movimentaCobra(tCobra cobra, int movimento) {
     int i;
     int auxLinha, auxColuna;
     int linhaAnterior = cobra.corpo[CABECA][LINHA];
     int colunaAnterior = cobra.corpo[CABECA][COLUNA];
-    cobra.corpo[CABECA][LINHA] += movimentos[mov][LINHA];
-    cobra.corpo[CABECA][COLUNA] += movimentos[mov][COLUNA];
+    cobra.corpo[CABECA][LINHA] += movimentos[movimento][LINHA];
+    cobra.corpo[CABECA][COLUNA] += movimentos[movimento][COLUNA];
     for (i = 1; i < TAM_COBRA; i++) {
         if (cobra.corpo[i][LINHA] != -1) {
             auxLinha = cobra.corpo[i][LINHA];
@@ -221,7 +221,7 @@ tCobra movimentaCobra(tCobra cobra, int mov) {
     }
     cobra.cauda[LINHA] = linhaAnterior;
     cobra.cauda[COLUNA] = colunaAnterior;
-    cobra.direcao = mov;
+    cobra.direcao = movimento;
     return cobra;
 }
 
@@ -266,13 +266,13 @@ int proximoMovimento(int mov, int direcaoDaCabeca) {
     return direcaoDaCabeca;
 }
 
-tJogo realizaMovimento(tJogo jogo, int mov) {
+tJogo realizaMovimento(tJogo jogo, int movimento) {
 
-    int realMov = proximoMovimento(mov, jogo.cobra.direcao);
+    int realMov = proximoMovimento(movimento, jogo.cobra.direcao);
     jogo.cobra = movimentaCobra(jogo.cobra, realMov);
     jogo.mapa = atualizaMapa(jogo.mapa, jogo.cobra);
 
-    printf("Estado do jogo apos o movimento '%c'\n", mov);
+    printf("Estado do jogo apos o movimento '%c'\n", movimento);
     imprimeMapa(jogo.mapa);
     printf("\n");
     return jogo;
