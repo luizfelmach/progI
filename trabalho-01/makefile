@@ -6,4 +6,4 @@ snake:
 	gcc -o snake snake.c
 
 clean:
-	rm -rf inicializacao.txt resumo.txt heat_map.txt estatisticas.txt ranking.txt snake
+	rm -rf inicializacao.txt resumo.txt heatmap.txt estatisticas.txt ranking.txt snake
