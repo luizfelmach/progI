@@ -42,9 +42,9 @@ typedef struct {
 
 typedef struct {
     int corpo[TAM_COBRA][2];
+    int cauda[2];
     int direcao;
     int tamanho;
-    int linhaDaCauda, colunaDaCauda;
 } tCobra;
 
 typedef struct {
@@ -167,8 +167,8 @@ void imprimeMapa(tMapa mapa) {
 
 tMapa atualizaMapa(tMapa mapa, tCobra cobra) {
     int i, linha, coluna;
-    int linhaDaCauda = cobra.linhaDaCauda;
-    int colunaDaCauda = cobra.colunaDaCauda;
+    int linhaDaCauda = cobra.cauda[LINHA];
+    int colunaDaCauda = cobra.cauda[COLUNA];
     int l = cobra.corpo[CABECA][LINHA];
     int c = cobra.corpo[CABECA][COLUNA];
     for (i = 1; i < TAM_COBRA; i++) {
@@ -219,8 +219,8 @@ tCobra movimentaCobra(tCobra cobra, int mov) {
             colunaAnterior = auxColuna;
         }
     }
-    cobra.linhaDaCauda = linhaAnterior;
-    cobra.colunaDaCauda = colunaAnterior;
+    cobra.cauda[LINHA] = linhaAnterior;
+    cobra.cauda[COLUNA] = colunaAnterior;
     cobra.direcao = mov;
     return cobra;
 }
