@@ -27,6 +27,11 @@
 #define COMIDA '*'
 #define DINHEIRO '$'
 #define TUNEL '@'
+#define COBRA_MORTA 'X'
+#define CORPO 'o'
+#define JOGANDO 0
+#define PERDEU 1
+#define VENCEU 2
 
 const char direcoes[4] = {'^', '>', 'v', '<'};
 const int movimentos[4][2] = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
@@ -56,15 +61,18 @@ typedef struct {
     tMapa mapa;
     tCobra cobra;
     int pontuacao;
+    int status;
 } tJogo;
 
 // Metodos para o tipo mapa
 
 tMapa carregaMapa(char* path);
 int ehCabeca(char c);
+int ehCorpo(char c);
 int linhaDaCabeca(tMapa mapa);
 int colunaDaCabeca(tMapa mapa);
 void imprimeMapa(tMapa mapa);
+void imprimeMapaCobraMorta(tMapa mapa);
 tMapa atualizaMapa(tMapa mapa, tCobra cobra);
 char objetoDaCabeca(tMapa, tCobra);
 int temComida(tMapa mapa);
@@ -103,6 +111,9 @@ int main(int argc, char* argv[]) {
 
     while (scanf("%c", &movimento) == 1) {
         jogo = realizaMovimento(jogo, movimento);
+        if (jogo.status == PERDEU || jogo.status == VENCEU) {
+            break;
+        }
         scanf("%*c");
     }
 
@@ -150,6 +161,11 @@ int ehCabeca(char c) {
     return verificacao;
 }
 
+int ehCorpo(char c) {
+    int verificacao = c == CORPO;
+    return verificacao;
+}
+
 int linhaDaCabeca(tMapa mapa) {
     int i, j;
 
@@ -187,6 +203,24 @@ void imprimeMapa(tMapa mapa) {
     for (i = 0; i < mapa.linhas; i++) {
         for (j = 0; j < mapa.colunas; j++) {
             printf("%c", mapa.objs[i][j]);
+        }
+        printf("\n");
+    }
+}
+
+void imprimeMapaCobraMorta(tMapa mapa) {
+    int i, j;
+    char objeto;
+
+    // Percorre e imprime o mapa
+    for (i = 0; i < mapa.linhas; i++) {
+        for (j = 0; j < mapa.colunas; j++) {
+            objeto = mapa.objs[i][j];
+            if (ehCabeca(objeto) || ehCorpo(objeto)) {
+                printf("%c", COBRA_MORTA);
+            } else {
+                printf("%c", objeto);
+            }
         }
         printf("\n");
     }
@@ -377,8 +411,8 @@ tCobra teleportaCobra(tMapa mapa, tCobra cobra) {
 // Metodos referentes ao jogo
 
 tJogo iniciaJogo(int argc, char* path) {
-    tJogo jogo;
 
+    // Verifica se foi passado um arquivo
     if (argc == 1) {
         printf(
             "ERRO: O diretorio de arquivos de configuracao nao foi "
@@ -386,8 +420,13 @@ tJogo iniciaJogo(int argc, char* path) {
         exit(0);
     }
 
-    jogo.mapa = carregaMapa(path);
-    jogo.cobra = inicializaCobra(jogo.mapa);
+    // Inicia o jogo com as variaveis resetadas
+    tJogo jogo = {
+        .mapa = carregaMapa(path),
+        .cobra = inicializaCobra(jogo.mapa),
+        .pontuacao = 0,
+        .status = JOGANDO
+    };
 
     return jogo;
 }
@@ -404,14 +443,14 @@ int proximaDirecao(int movimento, int direcaoDaCabeca) {
     if (movimento == 'h') {
         direcaoDaCabeca += 1;
         if (direcaoDaCabeca == 4) {
-            direcaoDaCabeca = 0;
+            direcaoDaCabeca = CIMA;
         }
     }
 
     if (movimento == 'a') {
         direcaoDaCabeca -= 1;
         if (direcaoDaCabeca == -1) {
-            direcaoDaCabeca = 3;
+            direcaoDaCabeca = ESQUERDA;
         }
     }
 
@@ -428,8 +467,7 @@ tJogo realizaMovimento(tJogo jogo, int movimento) {
     char objeto = objetoDaCabeca(jogo.mapa, jogo.cobra);
 
     if (objeto == PAREDE || colisaoComACobra(jogo.cobra)) {
-        perdeJogo(jogo);
-        exit(0);
+        jogo.status = PERDEU;
     }
     if (objeto == COMIDA) {
         jogo.cobra = aumentaCobra(jogo.cobra);
@@ -441,11 +479,12 @@ tJogo realizaMovimento(tJogo jogo, int movimento) {
 
     jogo.mapa = atualizaMapa(jogo.mapa, jogo.cobra);
 
+    if (!temComida(jogo.mapa)) {
+        jogo.status = VENCEU;
+    }
+
     estadoAtual(jogo, movimento);
 
-    if (!temComida(jogo.mapa)) {
-        venceJogo(jogo);
-    }
     return jogo;
 }
 
@@ -460,9 +499,22 @@ void venceJogo(tJogo jogo) {
 }
 
 void estadoAtual(tJogo jogo, int movimento) {
+    printf("\n");
     printf("Estado do jogo apos o movimento '%c':\n", movimento);
-    imprimeMapa(jogo.mapa);
-    printf("Pontuacao: %d\n", jogo.pontuacao);
+    if (jogo.status == JOGANDO) {
+        imprimeMapa(jogo.mapa);
+        printf("Pontuacao: %d", jogo.pontuacao);
+    }
+    if (jogo.status == VENCEU) {
+        imprimeMapa(jogo.mapa);
+        printf("Pontuacao: %d\n", jogo.pontuacao);
+        venceJogo(jogo);
+    }
+    if (jogo.status == PERDEU) {
+        imprimeMapaCobraMorta(jogo.mapa);
+        printf("Pontuacao: %d\n", jogo.pontuacao);
+        perdeJogo(jogo);
+    }
     printf("\n");
 }
 
