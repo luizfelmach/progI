@@ -203,25 +203,35 @@ tCobra inicializaCobra(int cabecaL, int cabecaC) {
 }
 
 tCobra movimentaCobra(tCobra cobra, int movimento) {
-    int i;
-    int auxLinha, auxColuna;
-    int linhaAnterior = cobra.corpo[CABECA][LINHA];
-    int colunaAnterior = cobra.corpo[CABECA][COLUNA];
+    int i, aux[2];
+
+    //Armazena a cauda ou uma parte do corpo anterior ate chegar na cauda
+    int cauda[2] = {
+        cobra.corpo[CABECA][LINHA],
+        cobra.corpo[CABECA][COLUNA]
+    };
+
+    // Faz o movimento da cabeca da cobra
     cobra.corpo[CABECA][LINHA] += movimentos[movimento][LINHA];
     cobra.corpo[CABECA][COLUNA] += movimentos[movimento][COLUNA];
+
+    // Movimenta o restante do corpo
     for (i = 1; i < TAM_COBRA; i++) {
         if (cobra.corpo[i][LINHA] != -1) {
-            auxLinha = cobra.corpo[i][LINHA];
-            auxColuna = cobra.corpo[i][COLUNA];
-            cobra.corpo[i][LINHA] = linhaAnterior;
-            cobra.corpo[i][COLUNA] = colunaAnterior;
-            linhaAnterior = auxLinha;
-            colunaAnterior = auxColuna;
+            aux[LINHA] = cobra.corpo[i][LINHA];
+            aux[COLUNA] = cobra.corpo[i][COLUNA];
+            cobra.corpo[i][LINHA] = cauda[LINHA];
+            cobra.corpo[i][COLUNA] = cauda[COLUNA];
+            cauda[LINHA] = aux[LINHA];
+            cauda[COLUNA] = aux[COLUNA];
         }
     }
-    cobra.cauda[LINHA] = linhaAnterior;
-    cobra.cauda[COLUNA] = colunaAnterior;
+
+    // Armazena a cauda e a ultima direcao
+    cobra.cauda[LINHA] = cauda[LINHA];
+    cobra.cauda[COLUNA] = cauda[COLUNA];
     cobra.direcao = movimento;
+
     return cobra;
 }
 
