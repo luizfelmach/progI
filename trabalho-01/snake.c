@@ -43,6 +43,7 @@ const int movimentos[4][2] = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
  *      tHeatMapa -> Armazena o tipo HeatMapa
  *      tCobra -> Armazena o tipo cobra
  *      tJogo -> Armazena os tipos referentes ao jogo
+ *      tEstatisticas -> Armazena as estatisticas do jogo
  *
  */
 
@@ -57,6 +58,12 @@ typedef struct {
 } tHeatMapa;
 
 typedef struct {
+    int totalMovimentos;
+    int semPontuar;
+    int movimentosDirecionados[4];
+} tEstatisticas;
+
+typedef struct {
     int corpo[TAM_COBRA][2];
     int cauda[2];
     int direcao;
@@ -66,6 +73,7 @@ typedef struct {
 typedef struct {
     tMapa mapa;
     tHeatMapa heatMapa;
+    tEstatisticas estatisticas;
     tCobra cobra;
     int pontuacao;
     int status;
@@ -88,6 +96,13 @@ int temComida(tMapa mapa);
 
 tHeatMapa inicializaHeatMapa(char* path);
 tHeatMapa rastreiaMovimento(tHeatMapa heatMapa, tCobra cobra);
+
+// Metodos para o tipo heatMapa
+tEstatisticas inicializaEstatisticas();
+tEstatisticas contaMovimento(tEstatisticas estatisticas);
+tEstatisticas contaMovimentoSemPontuar(tEstatisticas estatisticas);
+tEstatisticas contaMovimentoDirecionado(tEstatisticas estatisticas, int movimento);
+
 
 // Metodos referentes a cobra
 
@@ -122,11 +137,13 @@ int main(int argc, char* argv[]) {
     geraInicializacao(jogo);
 
     while (scanf("%c", &movimento) == 1) {
+        system("clear");
         jogo = realizaMovimento(jogo, movimento);
         if (jogo.status == PERDEU || jogo.status == VENCEU) {
             break;
         }
         scanf("%*c");
+        usleep(70000);
     }
 
     geraResumo(jogo);
@@ -328,6 +345,33 @@ tHeatMapa rastreiaMovimento(tHeatMapa heatMapa, tCobra cobra) {
     return heatMapa;
 }
 
+// Metodos para o tipo heatMapa
+
+tEstatisticas inicializaEstatisticas() {
+    tEstatisticas estatisticas = {
+        .totalMovimentos = 0,
+        .semPontuar = 0,
+        .movimentosDirecionados = {0, 0, 0, 0}
+    };
+
+    return estatisticas;
+}
+
+tEstatisticas contaMovimento(tEstatisticas estatisticas) {
+    estatisticas.totalMovimentos += 1;
+    return estatisticas;
+}
+
+tEstatisticas contaMovimentoSemPontuar(tEstatisticas estatisticas) {
+    estatisticas.semPontuar += 1;
+    return estatisticas;
+}
+
+tEstatisticas contaMovimentoDirecionado(tEstatisticas estatisticas, int movimento) {
+    estatisticas.movimentosDirecionados[movimento] += 1;
+    return estatisticas;
+}
+
 // Metodos referentes a cobra
 
 tCobra inicializaCobra(tMapa mapa) {
@@ -464,6 +508,7 @@ tJogo iniciaJogo(int argc, char* path) {
     // Inicia o jogo com as variaveis resetadas
     tJogo jogo = {.mapa = carregaMapa(path),
                   .heatMapa = inicializaHeatMapa(path),
+                  .estatisticas = inicializaEstatisticas(),
                   .cobra = inicializaCobra(jogo.mapa),
                   .pontuacao = 0,
                   .status = JOGANDO};
@@ -518,7 +563,11 @@ tJogo realizaMovimento(tJogo jogo, int movimento) {
     if (objeto == DINHEIRO) {
         jogo = aumentaPontuacao(jogo, 10);
     }
+    if (objeto != DINHEIRO && objeto != COMIDA) {
+        jogo.estatisticas = contaMovimentoSemPontuar(jogo.estatisticas);
+    }
 
+    jogo.estatisticas = contaMovimento(jogo.estatisticas);
     jogo.mapa = atualizaMapa(jogo.mapa, jogo.cobra);
 
     if (!temComida(jogo.mapa)) {
@@ -593,6 +642,8 @@ void geraRanking(tJogo jogo) {
 
 void geraEstatistica(tJogo jogo) {
     FILE* arquivo = fopen("estatisticas.txt", "w");
+    fprintf(arquivo, "Numero de movimentos: %d\n", jogo.estatisticas.totalMovimentos);
+    fprintf(arquivo, "Numero de movimentos sem pontuar: %d\n", jogo.estatisticas.semPontuar);
     fclose(arquivo);
 }
 
