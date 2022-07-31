@@ -53,7 +53,7 @@ typedef struct {
     char dinheiro;
     char tunel;
     char cobraMorta;
-        char corpo;
+    char corpo;
 } tMapa;
 
 typedef struct {
