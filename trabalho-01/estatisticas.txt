@@ -1,2 +1,0 @@
-Numero de movimentos: 9
-Numero de movimentos sem pontuar: 5

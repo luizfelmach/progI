@@ -126,6 +126,7 @@ tJogo realizaMovimento(tJogo jogo, int movimento);
 void perdeJogo(tJogo jogo);
 void venceJogo(tJogo jogo);
 void estadoAtual(tJogo jogo, int movimento);
+int terminouJogo(tJogo jogo);
 void geraInicializacao(tJogo jogo);
 void geraResumo(tJogo jogo);
 void geraRanking(tJogo jogo);
@@ -134,8 +135,10 @@ void geraHeatMapa(tJogo jogo);
 
 // Funcao principal
 
+tJogo jogo;
+
 int main(int argc, char* argv[]) {
-    tJogo jogo = iniciaJogo(argc, argv[1]);
+    jogo = iniciaJogo(argc, argv[1]);
     char movimento;
 
     geraInicializacao(jogo);
@@ -143,7 +146,7 @@ int main(int argc, char* argv[]) {
     while (scanf("%c", &movimento) == 1) {
         system("clear");
         jogo = realizaMovimento(jogo, movimento);
-        if (jogo.status == PERDEU || jogo.status == VENCEU) {
+        if (terminouJogo(jogo)) {
             break;
         }
         scanf("%*c");
@@ -626,6 +629,10 @@ void estadoAtual(tJogo jogo, int movimento) {
         perdeJogo(jogo);
     }
     printf("\n");
+}
+
+int terminouJogo(tJogo jogo) {
+    return jogo.status == PERDEU || jogo.status == VENCEU;
 }
 
 void geraInicializacao(tJogo jogo) {
