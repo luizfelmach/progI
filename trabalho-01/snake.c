@@ -15,20 +15,16 @@
 
 #define TAM_MAPA 200
 #define TAM_COBRA 200
+
 #define CABECA 0
 #define LINHA 0
 #define COLUNA 1
+
 #define CIMA 0
 #define DIREITA 1
 #define BAIXO 2
 #define ESQUERDA 3
-#define VAZIO ' '
-#define PAREDE '#'
-#define COMIDA '*'
-#define DINHEIRO '$'
-#define TUNEL '@'
-#define COBRA_MORTA 'X'
-#define CORPO 'o'
+
 #define JOGANDO 0
 #define PERDEU 1
 #define VENCEU 2
@@ -50,6 +46,14 @@ const int movimentos[4][2] = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
 typedef struct {
     char objs[TAM_MAPA][TAM_MAPA];
     int linhas, colunas;
+    char direcoes[4];
+    char vazio;
+    char parede;
+    char comida;
+    char dinheiro;
+    char tunel;
+    char cobraMorta;
+        char corpo;
 } tMapa;
 
 typedef struct {
@@ -82,8 +86,8 @@ typedef struct {
 // Metodos para o tipo mapa
 
 tMapa carregaMapa(char* path);
-int ehCabeca(char c);
-int ehCorpo(char c);
+int ehCabeca(tMapa mapa, char c);
+int ehCorpo(tMapa mapa, char c);
 int linhaDaCabeca(tMapa mapa);
 int colunaDaCabeca(tMapa mapa);
 void imprimeMapa(tMapa mapa);
@@ -143,7 +147,7 @@ int main(int argc, char* argv[]) {
             break;
         }
         scanf("%*c");
-        usleep(70000);
+        //usleep(70000);
     }
 
     geraResumo(jogo);
@@ -159,7 +163,16 @@ int main(int argc, char* argv[]) {
 tMapa carregaMapa(char* path) {
     int i, j;
     char obj;
-    tMapa mapa;
+    tMapa mapa = {
+        .direcoes = {'^', '>', 'v', '<'},
+        .vazio = ' ',
+        .parede = '#',
+        .comida = '*',
+        .dinheiro = '$',
+        .tunel = '@',
+        .cobraMorta = 'X',
+        .corpo = 'o'
+    };
     FILE* arquivo = fopen(path, "r");
 
     // Verifica se o arquivo existe
@@ -185,13 +198,18 @@ tMapa carregaMapa(char* path) {
     return mapa;
 }
 
-int ehCabeca(char c) {
-    int verificacao = c == '^' || c == '>' || c == 'v' || c == '<';
-    return verificacao;
+int ehCabeca(tMapa mapa, char c) {
+    int i;
+    for (i = 0; i < 4; i++) {
+        if (mapa.direcoes[i] == c) {
+            return 1;
+        }
+    }
+    return 0;
 }
 
-int ehCorpo(char c) {
-    int verificacao = c == CORPO;
+int ehCorpo(tMapa mapa, char c) {
+    int verificacao = c == mapa.corpo;
     return verificacao;
 }
 
@@ -201,7 +219,7 @@ int linhaDaCabeca(tMapa mapa) {
     // Percorre o mapa para achar a cabeca e retorna a linha
     for (i = 0; i < mapa.linhas; i++) {
         for (j = 0; j < mapa.colunas; j++) {
-            if (ehCabeca(mapa.objs[i][j])) {
+            if (ehCabeca(mapa, mapa.objs[i][j])) {
                 return i;
             }
         }
@@ -216,7 +234,7 @@ int colunaDaCabeca(tMapa mapa) {
     // Percorre o mapa para achar a cabeca e retorna a coluna
     for (i = 0; i < mapa.linhas; i++) {
         for (j = 0; j < mapa.colunas; j++) {
-            if (ehCabeca(mapa.objs[i][j])) {
+            if (ehCabeca(mapa, mapa.objs[i][j])) {
                 return j;
             }
         }
@@ -245,8 +263,8 @@ void imprimeMapaCobraMorta(tMapa mapa) {
     for (i = 0; i < mapa.linhas; i++) {
         for (j = 0; j < mapa.colunas; j++) {
             objeto = mapa.objs[i][j];
-            if (ehCabeca(objeto) || ehCorpo(objeto)) {
-                printf("%c", COBRA_MORTA);
+            if (ehCabeca(mapa, objeto) || ehCorpo(mapa, objeto)) {
+                printf("%c", mapa.cobraMorta);
             } else {
                 printf("%c", objeto);
             }
@@ -301,7 +319,7 @@ int temComida(tMapa mapa) {
     // Percorre o mapa retorna a quantidade de comida
     for (i = 0; i < mapa.linhas; i++) {
         for (j = 0; j < mapa.colunas; j++) {
-            if (mapa.objs[i][j] == COMIDA) {
+            if (mapa.objs[i][j] == mapa.comida) {
                 quantidadeDeComida++;
             }
         }
@@ -552,18 +570,18 @@ tJogo realizaMovimento(tJogo jogo, int movimento) {
 
     char objeto = objetoDaCabeca(jogo.mapa, jogo.cobra);
 
-    if (objeto == PAREDE || colisaoComACobra(jogo.cobra)) {
+    if (objeto == jogo.mapa.parede || colisaoComACobra(jogo.cobra)) {
         jogo.status = PERDEU;
         jogo.heatMapa = rastreiaMovimento(jogo.heatMapa, jogo.cobra);
     }
-    if (objeto == COMIDA) {
+    if (objeto == jogo.mapa.comida) {
         jogo.cobra = aumentaCobra(jogo.cobra);
         jogo = aumentaPontuacao(jogo, 1);
     }
-    if (objeto == DINHEIRO) {
+    if (objeto == jogo.mapa.dinheiro) {
         jogo = aumentaPontuacao(jogo, 10);
     }
-    if (objeto != DINHEIRO && objeto != COMIDA) {
+    if (objeto != jogo.mapa.dinheiro && objeto != jogo.mapa.comida) {
         jogo.estatisticas = contaMovimentoSemPontuar(jogo.estatisticas);
     }
 
