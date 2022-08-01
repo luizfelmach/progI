@@ -171,7 +171,7 @@ int main(int argc, char* argv[]) {
             break;
         }
         scanf("%*c");
-        usleep(70000);
+        //usleep(70000);
     }
 
     //geraResumo(jogo);

@@ -1,0 +1,162 @@
+[H[2J[3J[H[2J[3J[H[2J[3J[H[2J[3J[H[2J[3J[H[2J[3J[H[2J[3J[H[2J[3J[H[2J[3J[H[2J[3J[H[2J[3J[H[2J[3J[H[2J[3J[H[2J[3J[H[2J[3J[H[2J[3J[H[2J[3J[H[2J[3J
+Estado do jogo apos o movimento 'h':
+##         ### ### ## ###      #####
+##   *     ###  #      ##  $  ##  ##
+###    * *    $   $   $#    ####    
+###  *         v       #   #####    
+##       @  *      *@ ###  #####    
+Pontuacao: 0
+
+Estado do jogo apos o movimento 'h':
+##         ### ### ## ###      #####
+##   *     ###  #      ##  $  ##  ##
+###    * *    $   $   $#    ####    
+###  *        <        #   #####    
+##       @  *      *@ ###  #####    
+Pontuacao: 0
+
+Estado do jogo apos o movimento 'h':
+##         ### ### ## ###      #####
+##   *     ###  #      ##  $  ##  ##
+###    * *    ^   $   $#    ####    
+###  *                 #   #####    
+##       @  *      *@ ###  #####    
+Pontuacao: 10
+
+Estado do jogo apos o movimento 'a':
+##         ### ### ## ###      #####
+##   *     ###  #      ##  $  ##  ##
+###    * *   <    $   $#    ####    
+###  *                 #   #####    
+##       @  *      *@ ###  #####    
+Pontuacao: 10
+
+Estado do jogo apos o movimento 'c':
+##         ### ### ## ###      #####
+##   *     ###  #      ##  $  ##  ##
+###    * *  <     $   $#    ####    
+###  *                 #   #####    
+##       @  *      *@ ###  #####    
+Pontuacao: 10
+
+Estado do jogo apos o movimento 'c':
+##         ### ### ## ###      #####
+##   *     ###  #      ##  $  ##  ##
+###    * * <      $   $#    ####    
+###  *                 #   #####    
+##       @  *      *@ ###  #####    
+Pontuacao: 10
+
+Estado do jogo apos o movimento 'a':
+##         ### ### ## ###      #####
+##   *     ###  #      ##  $  ##  ##
+###    * *        $   $#    ####    
+###  *     v           #   #####    
+##       @  *      *@ ###  #####    
+Pontuacao: 10
+
+Estado do jogo apos o movimento 'h':
+##         ### ### ## ###      #####
+##   *     ###  #      ##  $  ##  ##
+###    * *        $   $#    ####    
+###  *    <            #   #####    
+##       @  *      *@ ###  #####    
+Pontuacao: 10
+
+Estado do jogo apos o movimento 'c':
+##         ### ### ## ###      #####
+##   *     ###  #      ##  $  ##  ##
+###    * *        $   $#    ####    
+###  *   <             #   #####    
+##       @  *      *@ ###  #####    
+Pontuacao: 10
+
+Estado do jogo apos o movimento 'c':
+##         ### ### ## ###      #####
+##   *     ###  #      ##  $  ##  ##
+###    * *        $   $#    ####    
+###  *  <              #   #####    
+##       @  *      *@ ###  #####    
+Pontuacao: 10
+
+Estado do jogo apos o movimento 'a':
+##         ### ### ## ###      #####
+##   *     ###  #      ##  $  ##  ##
+###    * *        $   $#    ####    
+###  *                 #   #####    
+##      v@  *      *@ ###  #####    
+Pontuacao: 10
+
+Estado do jogo apos o movimento 'a':
+##         ### ### ## ###      #####
+##   *     ###  #      ##  $  ##  ##
+###    * *        $   $#    ####    
+###  *                 #   #####    
+##       >  *      *@ ###  #####    
+Pontuacao: 10
+
+Estado do jogo apos o movimento 'a':
+##         ### ### ## ###      #####
+##   *     ###  #      ##  $  ##  ##
+###    * *        $   $#    ####    
+###  *   ^             #   #####    
+##          *      *@ ###  #####    
+Pontuacao: 10
+
+Estado do jogo apos o movimento 'a':
+##         ### ### ## ###      #####
+##   *     ###  #      ##  $  ##  ##
+###    * *        $   $#    ####    
+###  *  <              #   #####    
+##          *      *@ ###  #####    
+Pontuacao: 10
+
+Estado do jogo apos o movimento 'c':
+##         ### ### ## ###      #####
+##   *     ###  #      ##  $  ##  ##
+###    * *        $   $#    ####    
+###  * <               #   #####    
+##          *      *@ ###  #####    
+Pontuacao: 10
+
+Estado do jogo apos o movimento 'c':
+##         ### ### ## ###      #####
+##   *     ###  #      ##  $  ##  ##
+###    * *        $   $#    ####    
+###  *<                #   #####    
+##          *      *@ ###  #####    
+Pontuacao: 10
+
+Estado do jogo apos o movimento 'c':
+##         ### ### ## ###      #####
+##   *     ###  #      ##  $  ##  ##
+###    * *        $   $#    ####    
+###  <o                #   #####    
+##          *      *@ ###  #####    
+Pontuacao: 11
+
+Estado do jogo apos o movimento 'c':
+##         ### ### ## ###      [H[2J[3J[H[2J[3J#####
+##   *     ###  #      ##  $  ##  ##
+###    * *        $   $#    ####    
+### <o                 #   #####    
+##          *      *@ ###  #####    
+Pontuacao: 11
+
+Estado do jogo apos o movimento 'c':
+##         ### ### ## ###      #####
+##   *     ###  #      ##  $  ##  ##
+###    * *        $   $#    ####    
+###<o                  #   #####    
+##          *      *@ ###  #####    
+Pontuacao: 11
+
+Estado do jogo apos o movimento 'c':
+##         ### ### ## ###      #####
+##   *     ###  #      ##  $  ##  ##
+###    * *        $   $#    ####    
+##XX                   #   #####    
+##          *      *@ ###  #####    
+Pontuacao: 11
+Game over!
+Pontuacao final: 11
