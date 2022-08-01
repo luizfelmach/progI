@@ -79,6 +79,7 @@ typedef struct {
     tHeatMapa heatMapa;
     tEstatisticas estatisticas;
     tCobra cobra;
+    int numeroDaJogada;
     int pontuacao;
     int status;
 } tJogo;
@@ -96,17 +97,23 @@ tMapa atualizaMapa(tMapa mapa, tCobra cobra);
 char objetoDaCabeca(tMapa, tCobra);
 int temComida(tMapa mapa);
 
+// Metodos para o resumo
+
+void resumeGerouDinheiro(tJogo jogo, int  movimento);
+void resumeCrescimentoCobraSemTerminar(tJogo jogo, int movimento);
+void resumeCrescimentoCobraTerminandoJogo(tJogo jogo, int movimento);
+void resumeFimDeJogoPorColisao(tJogo jogo, int movimento);
+
 // Metodos para o tipo heatMapa
 
 tHeatMapa inicializaHeatMapa(char* path);
 tHeatMapa rastreiaMovimento(tHeatMapa heatMapa, tCobra cobra);
 
-// Metodos para o tipo heatMapa
+// Metodos para o tipo estatisticas
 tEstatisticas inicializaEstatisticas();
 tEstatisticas contaMovimento(tEstatisticas estatisticas);
 tEstatisticas contaMovimentoSemPontuar(tEstatisticas estatisticas);
 tEstatisticas contaMovimentoDirecionado(tEstatisticas estatisticas, int movimento);
-
 
 // Metodos referentes a cobra
 
@@ -141,6 +148,9 @@ int main(int argc, char* argv[]) {
 
     geraInicializacao(jogo);
 
+    FILE* temp = fopen("resumo.txt", "w");
+    fclose(temp);
+
     while (scanf("%c", &movimento) == 1) {
         system("clear");
         jogo = realizaMovimento(jogo, movimento);
@@ -151,7 +161,7 @@ int main(int argc, char* argv[]) {
         usleep(70000);
     }
 
-    geraResumo(jogo);
+    //geraResumo(jogo);
     geraRanking(jogo);
     geraEstatistica(jogo);
     geraHeatMapa(jogo);
@@ -329,6 +339,32 @@ int temComida(tMapa mapa) {
     return quantidadeDeComida;
 }
 
+// Metodos para o resumo
+
+void resumeGerouDinheiro(tJogo jogo, int  movimento) {
+    FILE* arquivo = fopen("resumo.txt", "a");
+    fprintf(arquivo, "Movimento %d (%c) gerou dinheiro\n", jogo.numeroDaJogada, movimento);
+    fclose(arquivo);
+}
+
+void resumeCrescimentoCobraSemTerminar(tJogo jogo, int movimento) {
+    FILE* arquivo = fopen("resumo.txt", "a");
+    fprintf(arquivo, "Movimento %d (%c) fez a cobra crescer para o tamanho %d\n", jogo.numeroDaJogada, movimento, jogo.cobra.tamanho);
+    fclose(arquivo);
+}
+
+void resumeCrescimentoCobraTerminandoJogo(tJogo jogo, int movimento) {
+    FILE* arquivo = fopen("resumo.txt", "a");
+    fprintf(arquivo, "Movimento %d (%c) fez a cobra crescer para o tamanho %d, terminando o jogo\n", jogo.numeroDaJogada, movimento, jogo.cobra.tamanho);
+    fclose(arquivo);
+}
+
+void resumeFimDeJogoPorColisao(tJogo jogo, int movimento) {
+    FILE* arquivo = fopen("resumo.txt", "a");
+    fprintf(arquivo, "Movimento %d (%c) resultou no fim de jogo por conta de colisao\n", jogo.numeroDaJogada, movimento);
+    fclose(arquivo);
+}
+
 // Metodos para o tipo heatMapa
 
 tHeatMapa inicializaHeatMapa(char* path) {
@@ -364,7 +400,7 @@ tHeatMapa rastreiaMovimento(tHeatMapa heatMapa, tCobra cobra) {
     return heatMapa;
 }
 
-// Metodos para o tipo heatMapa
+// Metodos para o tipo estatisticas
 
 tEstatisticas inicializaEstatisticas() {
     tEstatisticas estatisticas = {
@@ -530,6 +566,7 @@ tJogo iniciaJogo(int argc, char* path) {
                   .estatisticas = inicializaEstatisticas(),
                   .cobra = inicializaCobra(jogo.mapa),
                   .pontuacao = 0,
+                  .numeroDaJogada = 0,
                   .status = JOGANDO};
 
     return jogo;
@@ -565,6 +602,7 @@ tJogo realizaMovimento(tJogo jogo, int movimento) {
     jogo.heatMapa = rastreiaMovimento(jogo.heatMapa, jogo.cobra);
     jogo.estatisticas = contaMovimentoDirecionado(jogo.estatisticas, proximaDirecao(movimento, jogo.cobra.direcao));
     jogo.cobra = movimentaCobra(jogo.cobra, movimento);
+    jogo.numeroDaJogada += 1;
 
 
     if (passouDoMapa(jogo.mapa, jogo.cobra)) {
@@ -576,13 +614,23 @@ tJogo realizaMovimento(tJogo jogo, int movimento) {
     if (objeto == jogo.mapa.parede || colisaoComACobra(jogo.cobra)) {
         jogo.status = PERDEU;
         jogo.heatMapa = rastreiaMovimento(jogo.heatMapa, jogo.cobra);
+        resumeFimDeJogoPorColisao(jogo, movimento);
     }
     if (objeto == jogo.mapa.comida) {
         jogo.cobra = aumentaCobra(jogo.cobra);
         jogo = aumentaPontuacao(jogo, 1);
+
+        if (temComida(jogo.mapa) == 1) {
+            jogo.status = VENCEU;
+            jogo.heatMapa = rastreiaMovimento(jogo.heatMapa, jogo.cobra);
+            resumeCrescimentoCobraTerminandoJogo(jogo, movimento);
+        } else {
+            resumeCrescimentoCobraSemTerminar(jogo, movimento);
+        }
     }
     if (objeto == jogo.mapa.dinheiro) {
         jogo = aumentaPontuacao(jogo, 10);
+        resumeGerouDinheiro(jogo, movimento);
     }
     if (objeto != jogo.mapa.dinheiro && objeto != jogo.mapa.comida) {
         jogo.estatisticas = contaMovimentoSemPontuar(jogo.estatisticas);
