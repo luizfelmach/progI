@@ -563,7 +563,9 @@ int proximaDirecao(int movimento, int direcaoDaCabeca) {
 
 tJogo realizaMovimento(tJogo jogo, int movimento) {
     jogo.heatMapa = rastreiaMovimento(jogo.heatMapa, jogo.cobra);
+    jogo.estatisticas = contaMovimentoDirecionado(jogo.estatisticas, proximaDirecao(movimento, jogo.cobra.direcao));
     jogo.cobra = movimentaCobra(jogo.cobra, movimento);
+
 
     if (passouDoMapa(jogo.mapa, jogo.cobra)) {
         jogo.cobra = teleportaCobra(jogo.mapa, jogo.cobra);
@@ -667,6 +669,10 @@ void geraEstatistica(tJogo jogo) {
     FILE* arquivo = fopen("estatisticas.txt", "w");
     fprintf(arquivo, "Numero de movimentos: %d\n", jogo.estatisticas.totalMovimentos);
     fprintf(arquivo, "Numero de movimentos sem pontuar: %d\n", jogo.estatisticas.semPontuar);
+    fprintf(arquivo, "Numero de movimentos para baixo: %d\n", jogo.estatisticas.movimentosDirecionados[BAIXO]);
+    fprintf(arquivo, "Numero de movimentos para cima: %d\n", jogo.estatisticas.movimentosDirecionados[CIMA]);
+    fprintf(arquivo, "Numero de movimentos para esquerda: %d\n", jogo.estatisticas.movimentosDirecionados[ESQUERDA]);
+    fprintf(arquivo, "Numero de movimentos para direita: %d\n", jogo.estatisticas.movimentosDirecionados[DIREITA]);
     fclose(arquivo);
 }
 
