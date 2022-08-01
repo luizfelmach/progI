@@ -40,6 +40,7 @@ const int movimentos[4][2] = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
  *      tCobra -> Armazena o tipo cobra
  *      tJogo -> Armazena os tipos referentes ao jogo
  *      tEstatisticas -> Armazena as estatisticas do jogo
+ *      tRanking -> Armazena o tipo ranking
  *
  */
 
@@ -68,6 +69,11 @@ typedef struct {
 } tEstatisticas;
 
 typedef struct {
+    int pontos[TAM_MAPA*2][3];
+    int tamanho;
+} tRanking;
+
+typedef struct {
     int corpo[TAM_COBRA][2];
     int cauda[2];
     int direcao;
@@ -78,6 +84,7 @@ typedef struct {
     tMapa mapa;
     tHeatMapa heatMapa;
     tEstatisticas estatisticas;
+    tRanking ranking;
     tCobra cobra;
     int numeroDaJogada;
     int pontuacao;
@@ -114,6 +121,12 @@ tEstatisticas inicializaEstatisticas();
 tEstatisticas contaMovimento(tEstatisticas estatisticas);
 tEstatisticas contaMovimentoSemPontuar(tEstatisticas estatisticas);
 tEstatisticas contaMovimentoDirecionado(tEstatisticas estatisticas, int movimento);
+
+// Metodos para o tipo estatisticas
+
+tRanking inicializaRanking();
+tRanking atualizaRanking(tJogo jogo);
+tRanking ordenaRanking(tJogo jogo);
 
 // Metodos referentes a cobra
 
@@ -427,6 +440,96 @@ tEstatisticas contaMovimentoDirecionado(tEstatisticas estatisticas, int moviment
     return estatisticas;
 }
 
+// Metodos para o tipo estatisticas
+
+tRanking inicializaRanking() {
+    tRanking ranking = {
+        .tamanho = 0
+    };
+    return ranking;
+}
+
+tRanking atualizaRanking(tJogo jogo) {
+    int i;
+    int linhaCabeca = jogo.cobra.corpo[CABECA][LINHA];
+    int colunaCabeca = jogo.cobra.corpo[CABECA][COLUNA];
+
+    for (i = 0; i < jogo.ranking.tamanho; i++) {
+        if (jogo.ranking.pontos[i][LINHA] == linhaCabeca && jogo.ranking.pontos[i][COLUNA] == colunaCabeca) {
+            jogo.ranking.pontos[i][2] += 1;
+            return jogo.ranking;
+        }
+    }
+
+    jogo.ranking.pontos[jogo.ranking.tamanho][LINHA] = linhaCabeca;
+    jogo.ranking.pontos[jogo.ranking.tamanho][COLUNA] = colunaCabeca;
+    jogo.ranking.pontos[jogo.ranking.tamanho][2] = 1;
+    jogo.ranking.tamanho += 1;
+
+    return jogo.ranking;
+}
+
+tRanking ordenaRanking(tJogo jogo) {
+    int i, j, auxL, auxC, auxV, l1, c1, v1, l2, c2, v2;
+
+    for (i = 0; i < jogo.ranking.tamanho; i++) {
+        for (j = 0; j < jogo.ranking.tamanho - 1; j++) {
+            l1 = jogo.ranking.pontos[j][LINHA];
+            c1 = jogo.ranking.pontos[j][COLUNA];
+            v1 = jogo.ranking.pontos[j][2];
+
+            l2 = jogo.ranking.pontos[j + 1][LINHA];
+            c2 = jogo.ranking.pontos[j + 1][COLUNA];
+            v2 = jogo.ranking.pontos[j + 1][2];
+
+            if (v1 < v2) {
+                auxL = jogo.ranking.pontos[j][LINHA];
+                auxC = jogo.ranking.pontos[j][COLUNA];
+                auxV = jogo.ranking.pontos[j][2];
+
+                jogo.ranking.pontos[j][LINHA] = jogo.ranking.pontos[j + 1][LINHA];
+                jogo.ranking.pontos[j][COLUNA] = jogo.ranking.pontos[j + 1][COLUNA];
+                jogo.ranking.pontos[j][2] = jogo.ranking.pontos[j + 1][2];
+
+                jogo.ranking.pontos[j + 1][LINHA] = auxL;
+                jogo.ranking.pontos[j + 1][COLUNA] = auxC;
+                jogo.ranking.pontos[j + 1][2] = auxV;
+            } else if (v1 == v2) {
+                if (l1 > l2) {
+
+                    auxL = jogo.ranking.pontos[j][LINHA];
+                    auxC = jogo.ranking.pontos[j][COLUNA];
+                    auxV = jogo.ranking.pontos[j][2];
+
+                    jogo.ranking.pontos[j][LINHA] = jogo.ranking.pontos[j + 1][LINHA];
+                    jogo.ranking.pontos[j][COLUNA] = jogo.ranking.pontos[j + 1][COLUNA];
+                    jogo.ranking.pontos[j][2] = jogo.ranking.pontos[j + 1][2];
+
+                    jogo.ranking.pontos[j + 1][LINHA] = auxL;
+                    jogo.ranking.pontos[j + 1][COLUNA] = auxC;
+                    jogo.ranking.pontos[j + 1][2] = auxV;
+                } else if (l1 == l2) {
+                    if (c1 > c2) {
+                        auxL = jogo.ranking.pontos[j][LINHA];
+                        auxC = jogo.ranking.pontos[j][COLUNA];
+                        auxV = jogo.ranking.pontos[j][2];
+
+                        jogo.ranking.pontos[j][LINHA] = jogo.ranking.pontos[j + 1][LINHA];
+                        jogo.ranking.pontos[j][COLUNA] = jogo.ranking.pontos[j + 1][COLUNA];
+                        jogo.ranking.pontos[j][2] = jogo.ranking.pontos[j + 1][2];
+
+                        jogo.ranking.pontos[j + 1][LINHA] = auxL;
+                        jogo.ranking.pontos[j + 1][COLUNA] = auxC;
+                        jogo.ranking.pontos[j + 1][2] = auxV;
+                    }
+                }
+            }
+        }
+    }
+
+    return jogo.ranking;
+}
+
 // Metodos referentes a cobra
 
 tCobra inicializaCobra(tMapa mapa) {
@@ -565,6 +668,7 @@ tJogo iniciaJogo(int argc, char* path) {
                   .heatMapa = inicializaHeatMapa(path),
                   .estatisticas = inicializaEstatisticas(),
                   .cobra = inicializaCobra(jogo.mapa),
+                  .ranking = inicializaRanking(),
                   .pontuacao = 0,
                   .numeroDaJogada = 0,
                   .status = JOGANDO};
@@ -600,6 +704,7 @@ int proximaDirecao(int movimento, int direcaoDaCabeca) {
 
 tJogo realizaMovimento(tJogo jogo, int movimento) {
     jogo.heatMapa = rastreiaMovimento(jogo.heatMapa, jogo.cobra);
+    jogo.ranking = atualizaRanking(jogo);
     jogo.estatisticas = contaMovimentoDirecionado(jogo.estatisticas, proximaDirecao(movimento, jogo.cobra.direcao));
     jogo.cobra = movimentaCobra(jogo.cobra, movimento);
     jogo.numeroDaJogada += 1;
@@ -614,6 +719,7 @@ tJogo realizaMovimento(tJogo jogo, int movimento) {
     if (objeto == jogo.mapa.parede || colisaoComACobra(jogo.cobra)) {
         jogo.status = PERDEU;
         jogo.heatMapa = rastreiaMovimento(jogo.heatMapa, jogo.cobra);
+        jogo.ranking = atualizaRanking(jogo);
         resumeFimDeJogoPorColisao(jogo, movimento);
     }
     if (objeto == jogo.mapa.comida) {
@@ -642,6 +748,7 @@ tJogo realizaMovimento(tJogo jogo, int movimento) {
     if (!temComida(jogo.mapa)) {
         jogo.status = VENCEU;
         jogo.heatMapa = rastreiaMovimento(jogo.heatMapa, jogo.cobra);
+        jogo.ranking = atualizaRanking(jogo);
     }
 
     estadoAtual(jogo, movimento);
@@ -709,7 +816,14 @@ void geraResumo(tJogo jogo) {
 }
 
 void geraRanking(tJogo jogo) {
+    int i;
     FILE* arquivo = fopen("ranking.txt", "w");
+
+    jogo.ranking = ordenaRanking(jogo);
+
+    for (i = 0; i < jogo.ranking.tamanho; i++) {
+        fprintf(arquivo, "(%d, %d) - %d\n", jogo.ranking.pontos[i][LINHA], jogo.ranking.pontos[i][COLUNA], jogo.ranking.pontos[i][2]);
+    }
     fclose(arquivo);
 }
 
