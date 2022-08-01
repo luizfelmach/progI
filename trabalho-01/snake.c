@@ -135,10 +135,8 @@ void geraHeatMapa(tJogo jogo);
 
 // Funcao principal
 
-tJogo jogo;
-
 int main(int argc, char* argv[]) {
-    jogo = iniciaJogo(argc, argv[1]);
+    tJogo jogo = iniciaJogo(argc, argv[1]);
     char movimento;
 
     geraInicializacao(jogo);
@@ -150,7 +148,7 @@ int main(int argc, char* argv[]) {
             break;
         }
         scanf("%*c");
-        //usleep(70000);
+        usleep(70000);
     }
 
     geraResumo(jogo);
