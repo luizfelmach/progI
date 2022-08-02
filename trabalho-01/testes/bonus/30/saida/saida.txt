@@ -1,5 +1,0 @@
-[H[2J[3J
-Estado do jogo apos o movimento 'a':
-Pontuacao: 0
-Voce venceu!
-Pontuacao final: 0
