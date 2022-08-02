@@ -1,4 +1,4 @@
-[H[2J[3J[H[2J[3J[H[2J[3J[H[2J[3J[H[2J[3J[H[2J[3J[H[2J[3J[H[2J[3J[H[2J[3J[H[2J[3J[H[2J[3J[H[2J[3J[H[2J[3J[H[2J[3J[H[2J[3J[H[2J[3J[H[2J[3J[H[2J[3J[H[2J[3J[H[2J[3J[H[2J[3J
+
 Estado do jogo apos o movimento 'c':
    ##     >      
    ##       $#   
@@ -227,7 +227,7 @@ Estado do jogo apos o movimento 'c':
      ####     ^##
      ## $#### o##
     ###  ###   ##
-#  * ##  ##    [H[2J[3J[H[2J[3J[H[2J[3J[H[2J[3J[H[2J[3J[H[2J[3J[H[2J[3J[H[2J[3J[H[2J[3J[H[2J[3J[H[2J[3J[H[2J[3J[H[2J[3J[H[2J[3J[H[2J[3J[H[2J[3J[H[2J[3J[H[2J[3J[H[2J[3J[H[2J[3J[H[2J[3J##
+#  * ##  ##    ##
 Pontuacao: 31
 
 Estado do jogo apos o movimento 'a':
@@ -457,7 +457,7 @@ Estado do jogo apos o movimento 'a':
  *  $ ###    ####
      ####      ##
      ##  ####  ##
-    ###  ### [H[2J[3J[H[2J[3J[H[2J[3J[H[2J[3J[H[2J[3J[H[2J[3J[H[2J[3J[H[2J[3J[H[2J[3J[H[2J[3J[H[2J[3J  ##
+    ###  ###   ##
 #  * ##  ##    ##
 Pontuacao: 41
 

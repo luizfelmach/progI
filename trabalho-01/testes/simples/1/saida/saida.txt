@@ -1,4 +1,4 @@
-[H[2J[3J[H[2J[3J[H[2J[3J[H[2J[3J[H[2J[3J[H[2J[3J[H[2J[3J[H[2J[3J[H[2J[3J
+
 Estado do jogo apos o movimento 'c':
 ######
 #    #
