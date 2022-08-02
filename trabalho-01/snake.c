@@ -457,8 +457,7 @@ tHeatMapa inicializaHeatMapa(char *diretorio) {
   char path[TAM_DIRETORIO*2] = "";
 
   strcat(path, diretorio);
-  strcat(path, SAIDA_DIR);
-  strcat(path, HEATMAPA_DIR);
+  strcat(path, MAPA_DIR);
 
   FILE *arquivo = fopen(path, "r");
 
