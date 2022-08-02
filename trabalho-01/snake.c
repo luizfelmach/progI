@@ -9,12 +9,14 @@
 // Bibliotecas
 
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 
 // Constantes globais
 
 #define TAM_MAPA 200
 #define TAM_COBRA 200
+#define TAM_DIRETORIO 1010
 
 #define CABECA 0
 #define LINHA 0
@@ -28,6 +30,15 @@
 #define JOGANDO 0
 #define PERDEU 1
 #define VENCEU 2
+
+#define SAIDA_DIR "/saida"
+#define MAPA_DIR "/mapa.txt"
+#define INICIALIZACAO_DIR "/inicializacao.txt"
+#define RESUMO_DIR "/resumo.txt"
+#define RANKING_DIR "/ranking.txt"
+#define ESTATISTICAS_DIR "/estatisticas.txt"
+#define HEATMAPA_DIR "/heatmap.txt"
+
 
 const char direcoes[4] = {'^', '>', 'v', '<'};
 const int movimentos[4][2] = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
@@ -86,6 +97,7 @@ typedef struct {
   tEstatisticas estatisticas;
   tRanking ranking;
   tCobra cobra;
+  char diretorio[TAM_DIRETORIO];
   int numeroDaJogada;
   int pontuacao;
   int status;
@@ -93,7 +105,7 @@ typedef struct {
 
 // Metodos para o tipo mapa
 
-tMapa carregaMapa(char *path);
+tMapa carregaMapa(char *diretorio);
 int ehCabeca(tMapa mapa, char c);
 int ehCorpo(tMapa mapa, char c);
 int linhaDaCabeca(tMapa mapa);
@@ -113,7 +125,7 @@ void resumeFimDeJogoPorColisao(tJogo jogo, int movimento);
 
 // Metodos para o tipo heatMapa
 
-tHeatMapa inicializaHeatMapa(char *path);
+tHeatMapa inicializaHeatMapa(char *diretorio);
 tHeatMapa rastreiaMovimento(tHeatMapa heatMapa, tCobra cobra);
 
 // Metodos para o tipo estatisticas
@@ -140,7 +152,7 @@ tCobra teleportaCobra(tMapa mapa, tCobra cobra);
 
 // Metodos referentes ao jogo
 
-tJogo iniciaJogo(int argc, char *path);
+tJogo iniciaJogo(int argc, char *diretorio);
 tJogo aumentaPontuacao(tJogo jogo, int quantidade);
 int proximaDirecao(int movimento, int direcaoDaCabeca);
 tJogo realizaMovimento(tJogo jogo, int movimento);
@@ -162,8 +174,8 @@ int main(int argc, char *argv[]) {
 
   geraInicializacao(jogo);
 
-  FILE *temp = fopen("./saida/resumo.txt", "w");
-  fclose(temp);
+  //FILE *temp = fopen("./saida/resumo.txt", "w");
+  //fclose(temp);
 
   while (scanf("%c", &movimento) == 1) {
     // system("clear");
@@ -185,9 +197,9 @@ int main(int argc, char *argv[]) {
 
 // Metodos para o tipo mapa
 
-tMapa carregaMapa(char *path) {
+tMapa carregaMapa(char *diretorio) {
   int i, j;
-  char obj;
+  char obj, path[TAM_DIRETORIO*2] = "";
   tMapa mapa = {.direcoes = {'^', '>', 'v', '<'},
                 .vazio = ' ',
                 .parede = '#',
@@ -196,6 +208,10 @@ tMapa carregaMapa(char *path) {
                 .tunel = '@',
                 .cobraMorta = 'X',
                 .corpo = 'o'};
+
+  strcat(path, diretorio);
+  strcat(path, MAPA_DIR);
+
   FILE *arquivo = fopen(path, "r");
 
   // Verifica se o arquivo existe
@@ -354,21 +370,57 @@ int temComida(tMapa mapa) {
 // Metodos para o resumo
 
 void resumeGerouDinheiro(tJogo jogo, int movimento) {
-  FILE *arquivo = fopen("./saida/resumo.txt", "a");
+  char path[TAM_DIRETORIO*2] = "";
+
+  strcat(path, jogo.diretorio);
+  strcat(path, SAIDA_DIR);
+  strcat(path, RESUMO_DIR);
+
+  FILE *arquivo = fopen(path, "a");
+
+  if (!arquivo) {
+    printf("Nao foi possivel abrir o arquivo %s\n", path);
+    exit(0);
+  }
+
   fprintf(arquivo, "Movimento %d (%c) gerou dinheiro\n", jogo.numeroDaJogada,
           movimento);
   fclose(arquivo);
 }
 
 void resumeCrescimentoCobraSemTerminar(tJogo jogo, int movimento) {
-  FILE *arquivo = fopen("./saida/resumo.txt", "a");
+  char path[TAM_DIRETORIO*2] = "";
+
+  strcat(path, jogo.diretorio);
+  strcat(path, SAIDA_DIR);
+  strcat(path, RESUMO_DIR);
+
+  FILE *arquivo = fopen(path, "a");
+
+  if (!arquivo) {
+    printf("Nao foi possivel abrir o arquivo %s\n", path);
+    exit(0);
+  }
+
   fprintf(arquivo, "Movimento %d (%c) fez a cobra crescer para o tamanho %d\n",
           jogo.numeroDaJogada, movimento, jogo.cobra.tamanho);
   fclose(arquivo);
 }
 
 void resumeCrescimentoCobraTerminandoJogo(tJogo jogo, int movimento) {
-  FILE *arquivo = fopen("./saida/resumo.txt", "a");
+  char path[TAM_DIRETORIO*2] = "";
+
+  strcat(path, jogo.diretorio);
+  strcat(path, SAIDA_DIR);
+  strcat(path, RESUMO_DIR);
+
+  FILE *arquivo = fopen(path, "a");
+
+  if (!arquivo) {
+    printf("Nao foi possivel abrir o arquivo %s\n", path);
+    exit(0);
+  }
+
   fprintf(arquivo,
           "Movimento %d (%c) fez a cobra crescer para o tamanho %d, terminando "
           "o jogo\n",
@@ -377,7 +429,19 @@ void resumeCrescimentoCobraTerminandoJogo(tJogo jogo, int movimento) {
 }
 
 void resumeFimDeJogoPorColisao(tJogo jogo, int movimento) {
-  FILE *arquivo = fopen("./saida/resumo.txt", "a");
+  char path[TAM_DIRETORIO*2] = "";
+
+  strcat(path, jogo.diretorio);
+  strcat(path, SAIDA_DIR);
+  strcat(path, RESUMO_DIR);
+
+  FILE *arquivo = fopen(path, "a");
+
+  if (!arquivo) {
+    printf("Nao foi possivel abrir o arquivo %s\n", path);
+    exit(0);
+  }
+
   fprintf(arquivo,
           "Movimento %d (%c) resultou no fim de jogo por conta de colisao\n",
           jogo.numeroDaJogada, movimento);
@@ -386,9 +450,16 @@ void resumeFimDeJogoPorColisao(tJogo jogo, int movimento) {
 
 // Metodos para o tipo heatMapa
 
-tHeatMapa inicializaHeatMapa(char *path) {
+tHeatMapa inicializaHeatMapa(char *diretorio) {
   int i, j;
   tHeatMapa heatMapa;
+
+  char path[TAM_DIRETORIO*2] = "";
+
+  strcat(path, diretorio);
+  strcat(path, SAIDA_DIR);
+  strcat(path, HEATMAPA_DIR);
+
   FILE *arquivo = fopen(path, "r");
 
   // Verifica se o arquivo existe
@@ -658,7 +729,7 @@ tCobra teleportaCobra(tMapa mapa, tCobra cobra) {
 
 // Metodos referentes ao jogo
 
-tJogo iniciaJogo(int argc, char *path) {
+tJogo iniciaJogo(int argc, char *diretorio) {
   // Verifica se foi passado um arquivo
   if (argc == 1) {
     printf("ERRO: O diretorio de arquivos de configuracao nao foi "
@@ -667,14 +738,16 @@ tJogo iniciaJogo(int argc, char *path) {
   }
 
   // Inicia o jogo com as variaveis resetadas
-  tJogo jogo = {.mapa = carregaMapa(path),
-                .heatMapa = inicializaHeatMapa(path),
+  tJogo jogo = {.mapa = carregaMapa(diretorio),
+                .heatMapa = inicializaHeatMapa(diretorio),
                 .estatisticas = inicializaEstatisticas(),
                 .cobra = inicializaCobra(jogo.mapa),
                 .ranking = inicializaRanking(),
                 .pontuacao = 0,
                 .numeroDaJogada = 0,
                 .status = JOGANDO};
+
+  strcpy(jogo.diretorio, diretorio);
 
   return jogo;
 }
@@ -795,7 +868,18 @@ int terminouJogo(tJogo jogo) {
 
 void geraInicializacao(tJogo jogo) {
   int i, j;
-  FILE *arquivo = fopen("./saida/inicializacao.txt", "w");
+  char path[TAM_DIRETORIO*2] = "";
+
+  strcat(path, jogo.diretorio);
+  strcat(path, SAIDA_DIR);
+  strcat(path, INICIALIZACAO_DIR);
+
+  FILE *arquivo = fopen(path, "w");
+
+  if (!arquivo) {
+    printf("Nao foi possivel abrir o arquivo %s\n", path);
+    exit(0);
+  }
 
   for (i = 0; i < jogo.mapa.linhas; i++) {
     for (j = 0; j < jogo.mapa.colunas; j++) {
@@ -820,7 +904,18 @@ void geraResumo(tJogo jogo) {
 
 void geraRanking(tJogo jogo) {
   int i;
-  FILE *arquivo = fopen("./saida/ranking.txt", "w");
+  char path[TAM_DIRETORIO*2] = "";
+
+  strcat(path, jogo.diretorio);
+  strcat(path, SAIDA_DIR);
+  strcat(path, RANKING_DIR);
+
+  FILE *arquivo = fopen(path, "w");
+
+  if (!arquivo) {
+    printf("Nao foi possivel abrir o arquivo %s\n", path);
+    exit(0);
+  }
 
   jogo.ranking = ordenaRanking(jogo);
 
@@ -832,7 +927,19 @@ void geraRanking(tJogo jogo) {
 }
 
 void geraEstatistica(tJogo jogo) {
-  FILE *arquivo = fopen("./saida/estatisticas.txt", "w");
+  char path[TAM_DIRETORIO*2] = "";
+
+  strcat(path, jogo.diretorio);
+  strcat(path, SAIDA_DIR);
+  strcat(path, ESTATISTICAS_DIR);
+
+  FILE *arquivo = fopen(path, "w");
+
+  if (!arquivo) {
+    printf("Nao foi possivel abrir o arquivo %s\n", path);
+    exit(0);
+  }
+
   fprintf(arquivo, "Numero de movimentos: %d\n",
           jogo.estatisticas.totalMovimentos);
   fprintf(arquivo, "Numero de movimentos sem pontuar: %d\n",
@@ -850,7 +957,18 @@ void geraEstatistica(tJogo jogo) {
 
 void geraHeatMapa(tJogo jogo) {
   int i, j;
-  FILE *arquivo = fopen("./saida/heatmap.txt", "w");
+  char path[TAM_DIRETORIO*2] = "";
+
+  strcat(path, jogo.diretorio);
+  strcat(path, SAIDA_DIR);
+  strcat(path, HEATMAPA_DIR);
+
+  FILE *arquivo = fopen(path, "w");
+
+  if (!arquivo) {
+    printf("Nao foi possivel abrir o arquivo %s\n", path);
+    exit(0);
+  }
 
   for (i = 0; i < jogo.heatMapa.linhas; i++) {
     for (j = 0; j < jogo.heatMapa.colunas; j++) {

@@ -2,3 +2,51 @@ Movimento 2 (c) fez a cobra crescer para o tamanho 2
 Movimento 4 (h) fez a cobra crescer para o tamanho 3
 Movimento 5 (c) gerou dinheiro
 Movimento 9 (c) fez a cobra crescer para o tamanho 4, terminando o jogo
+Movimento 2 (c) fez a cobra crescer para o tamanho 2
+Movimento 8 (h) fez a cobra crescer para o tamanho 3
+Movimento 9 (c) gerou dinheiro
+Movimento 10 (a) resultou no fim de jogo por conta de colisao
+Movimento 2 (c) fez a cobra crescer para o tamanho 2
+Movimento 4 (h) fez a cobra crescer para o tamanho 3
+Movimento 5 (c) gerou dinheiro
+Movimento 9 (c) fez a cobra crescer para o tamanho 4, terminando o jogo
+Movimento 2 (c) fez a cobra crescer para o tamanho 2
+Movimento 4 (h) fez a cobra crescer para o tamanho 3
+Movimento 5 (c) gerou dinheiro
+Movimento 9 (c) fez a cobra crescer para o tamanho 4, terminando o jogo
+Movimento 2 (c) fez a cobra crescer para o tamanho 2
+Movimento 4 (h) fez a cobra crescer para o tamanho 3
+Movimento 5 (c) gerou dinheiro
+Movimento 9 (c) fez a cobra crescer para o tamanho 4, terminando o jogo
+Movimento 2 (c) fez a cobra crescer para o tamanho 2
+Movimento 4 (h) fez a cobra crescer para o tamanho 3
+Movimento 5 (c) gerou dinheiro
+Movimento 9 (c) fez a cobra crescer para o tamanho 4, terminando o jogo
+Movimento 2 (c) fez a cobra crescer para o tamanho 2
+Movimento 4 (h) fez a cobra crescer para o tamanho 3
+Movimento 5 (c) gerou dinheiro
+Movimento 9 (c) fez a cobra crescer para o tamanho 4, terminando o jogo
+Movimento 2 (c) fez a cobra crescer para o tamanho 2
+Movimento 4 (h) fez a cobra crescer para o tamanho 3
+Movimento 5 (c) gerou dinheiro
+Movimento 9 (c) fez a cobra crescer para o tamanho 4, terminando o jogo
+Movimento 2 (c) fez a cobra crescer para o tamanho 2
+Movimento 4 (h) fez a cobra crescer para o tamanho 3
+Movimento 5 (c) gerou dinheiro
+Movimento 9 (c) fez a cobra crescer para o tamanho 4, terminando o jogo
+Movimento 2 (c) fez a cobra crescer para o tamanho 2
+Movimento 4 (h) fez a cobra crescer para o tamanho 3
+Movimento 5 (c) gerou dinheiro
+Movimento 9 (c) fez a cobra crescer para o tamanho 4, terminando o jogo
+Movimento 2 (c) fez a cobra crescer para o tamanho 2
+Movimento 4 (h) fez a cobra crescer para o tamanho 3
+Movimento 5 (c) gerou dinheiro
+Movimento 9 (c) fez a cobra crescer para o tamanho 4, terminando o jogo
+Movimento 2 (c) fez a cobra crescer para o tamanho 2
+Movimento 4 (h) fez a cobra crescer para o tamanho 3
+Movimento 5 (c) gerou dinheiro
+Movimento 9 (c) fez a cobra crescer para o tamanho 4, terminando o jogo
+Movimento 2 (c) fez a cobra crescer para o tamanho 2
+Movimento 4 (h) fez a cobra crescer para o tamanho 3
+Movimento 5 (c) gerou dinheiro
+Movimento 9 (c) fez a cobra crescer para o tamanho 4, terminando o jogo
