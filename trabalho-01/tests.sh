@@ -8,7 +8,7 @@ do
     do
         rm -r $testFolder/saida/
         mkdir $testFolder/saida
-        ./snake $testFolder/mapa.txt < $testFolder/movimentos.txt > $testFolder/saida/saida.txt
+        ./snake $testFolder < $testFolder/movimentos.txt > $testFolder/saida/saida.txt
     done
 done
 

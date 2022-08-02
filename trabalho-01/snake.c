@@ -69,7 +69,7 @@ typedef struct {
 } tEstatisticas;
 
 typedef struct {
-    int pontos[TAM_MAPA*2][3];
+    int pontos[TAM_MAPA*TAM_MAPA][3];
     int tamanho;
 } tRanking;
 
@@ -161,11 +161,11 @@ int main(int argc, char* argv[]) {
 
     geraInicializacao(jogo);
 
-    FILE* temp = fopen("resumo.txt", "w");
+    FILE* temp = fopen("./saida/resumo.txt", "w");
     fclose(temp);
 
     while (scanf("%c", &movimento) == 1) {
-        system("clear");
+        //system("clear");
         jogo = realizaMovimento(jogo, movimento);
         if (terminouJogo(jogo)) {
             break;
@@ -355,25 +355,25 @@ int temComida(tMapa mapa) {
 // Metodos para o resumo
 
 void resumeGerouDinheiro(tJogo jogo, int  movimento) {
-    FILE* arquivo = fopen("resumo.txt", "a");
+    FILE* arquivo = fopen("./saida/resumo.txt", "a");
     fprintf(arquivo, "Movimento %d (%c) gerou dinheiro\n", jogo.numeroDaJogada, movimento);
     fclose(arquivo);
 }
 
 void resumeCrescimentoCobraSemTerminar(tJogo jogo, int movimento) {
-    FILE* arquivo = fopen("resumo.txt", "a");
+    FILE* arquivo = fopen("./saida/resumo.txt", "a");
     fprintf(arquivo, "Movimento %d (%c) fez a cobra crescer para o tamanho %d\n", jogo.numeroDaJogada, movimento, jogo.cobra.tamanho);
     fclose(arquivo);
 }
 
 void resumeCrescimentoCobraTerminandoJogo(tJogo jogo, int movimento) {
-    FILE* arquivo = fopen("resumo.txt", "a");
+    FILE* arquivo = fopen("./saida/resumo.txt", "a");
     fprintf(arquivo, "Movimento %d (%c) fez a cobra crescer para o tamanho %d, terminando o jogo\n", jogo.numeroDaJogada, movimento, jogo.cobra.tamanho);
     fclose(arquivo);
 }
 
 void resumeFimDeJogoPorColisao(tJogo jogo, int movimento) {
-    FILE* arquivo = fopen("resumo.txt", "a");
+    FILE* arquivo = fopen("./saida/resumo.txt", "a");
     fprintf(arquivo, "Movimento %d (%c) resultou no fim de jogo por conta de colisao\n", jogo.numeroDaJogada, movimento);
     fclose(arquivo);
 }
@@ -728,7 +728,7 @@ tJogo realizaMovimento(tJogo jogo, int movimento) {
 
         if (temComida(jogo.mapa) == 1) {
             jogo.status = VENCEU;
-            jogo.heatMapa = rastreiaMovimento(jogo.heatMapa, jogo.cobra);
+            //jogo.heatMapa = rastreiaMovimento(jogo.heatMapa, jogo.cobra);
             resumeCrescimentoCobraTerminandoJogo(jogo, movimento);
         } else {
             resumeCrescimentoCobraSemTerminar(jogo, movimento);
@@ -792,7 +792,7 @@ int terminouJogo(tJogo jogo) {
 
 void geraInicializacao(tJogo jogo) {
     int i, j;
-    FILE* arquivo = fopen("inicializacao.txt", "w");
+    FILE* arquivo = fopen("./saida/inicializacao.txt", "w");
 
     for (i = 0; i < jogo.mapa.linhas; i++) {
         for (j = 0; j < jogo.mapa.colunas; j++) {
@@ -811,13 +811,13 @@ void geraInicializacao(tJogo jogo) {
 }
 
 void geraResumo(tJogo jogo) {
-    FILE* arquivo = fopen("resumo.txt", "w");
+    FILE* arquivo = fopen("./saida/resumo.txt", "w");
     fclose(arquivo);
 }
 
 void geraRanking(tJogo jogo) {
     int i;
-    FILE* arquivo = fopen("ranking.txt", "w");
+    FILE* arquivo = fopen("./saida/ranking.txt", "w");
 
     jogo.ranking = ordenaRanking(jogo);
 
@@ -828,7 +828,7 @@ void geraRanking(tJogo jogo) {
 }
 
 void geraEstatistica(tJogo jogo) {
-    FILE* arquivo = fopen("estatisticas.txt", "w");
+    FILE* arquivo = fopen("./saida/estatisticas.txt", "w");
     fprintf(arquivo, "Numero de movimentos: %d\n", jogo.estatisticas.totalMovimentos);
     fprintf(arquivo, "Numero de movimentos sem pontuar: %d\n", jogo.estatisticas.semPontuar);
     fprintf(arquivo, "Numero de movimentos para baixo: %d\n", jogo.estatisticas.movimentosDirecionados[BAIXO]);
@@ -840,7 +840,7 @@ void geraEstatistica(tJogo jogo) {
 
 void geraHeatMapa(tJogo jogo) {
     int i, j;
-    FILE* arquivo = fopen("heatmap.txt", "w");
+    FILE* arquivo = fopen("./saida/heatmap.txt", "w");
 
     for (i = 0; i < jogo.heatMapa.linhas; i++) {
         for (j = 0; j < jogo.heatMapa.colunas; j++) {
