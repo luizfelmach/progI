@@ -17,6 +17,7 @@
 #define TAM_MAPA 200
 #define TAM_COBRA 200
 #define TAM_DIRETORIO 1010
+#define TAM_TUNEL 2
 
 #define CABECA 0
 #define LINHA 0
@@ -52,6 +53,7 @@ const int movimentos[4][2] = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
  *      tJogo -> Armazena os tipos referentes ao jogo
  *      tEstatisticas -> Armazena as estatisticas do jogo
  *      tRanking -> Armazena o tipo ranking
+ *      tTunel -> Armazena as informacoes do tipo tunel
  *
  */
 
@@ -92,11 +94,17 @@ typedef struct {
 } tCobra;
 
 typedef struct {
+    int tuneis[TAM_TUNEL][2];
+    int temTunel;
+} tTunel;
+
+typedef struct {
   tMapa mapa;
   tHeatMapa heatMapa;
   tEstatisticas estatisticas;
   tRanking ranking;
   tCobra cobra;
+  tTunel tunel;
   char diretorio[TAM_DIRETORIO];
   int numeroDaJogada;
   int pontuacao;
@@ -148,7 +156,15 @@ tCobra movimentaCobra(tCobra cobra, int movimento);
 tCobra aumentaCobra(tCobra cobra);
 int colisaoComACobra(tCobra cobra);
 int passouDoMapa(tMapa mapa, tCobra cobra);
+int entrouNoTunel(tJogo jogo);
 tCobra teleportaCobra(tMapa mapa, tCobra cobra);
+
+// Metodos referentes ao tunel
+
+tTunel inicializaTunel(tJogo jogo);
+tJogo tunelizaCobra(tJogo jogo);
+int pegaTunelOposto(tJogo jogo, int x, int y);
+int temTunel(tJogo jogo);
 
 // Metodos referentes ao jogo
 
@@ -178,13 +194,13 @@ int main(int argc, char *argv[]) {
   //fclose(temp);
 
   while (scanf("%c", &movimento) == 1) {
-    // system("clear");
+    system("clear");
     jogo = realizaMovimento(jogo, movimento);
     if (terminouJogo(jogo)) {
       break;
     }
     scanf("%*c");
-    // usleep(70000);
+    usleep(70000);
   }
 
   // geraResumo(jogo);
@@ -705,6 +721,15 @@ int passouDoMapa(tMapa mapa, tCobra cobra) {
   return 0;
 }
 
+int entrouNoTunel(tJogo jogo) {
+  int cabeca[2] = {jogo.cobra.corpo[CABECA][LINHA], jogo.cobra.corpo[CABECA][COLUNA]};
+  if(jogo.mapa.objs[cabeca[LINHA]][cabeca[COLUNA]] == jogo.mapa.tunel) {
+      return 1;
+  }
+
+  return 0;
+}
+
 tCobra teleportaCobra(tMapa mapa, tCobra cobra) {
   // Pega as coordenadas da cabeca
   int cabeca[2] = {cobra.corpo[CABECA][LINHA], cobra.corpo[CABECA][COLUNA]};
@@ -724,6 +749,54 @@ tCobra teleportaCobra(tMapa mapa, tCobra cobra) {
   }
 
   return cobra;
+}
+
+// Metodos referentes ao tunel
+
+tTunel inicializaTunel(tJogo jogo) {
+    tTunel tunel;
+    int t = 0, i, j;
+    char c;
+
+    for (i = 0; i < jogo.mapa.linhas; i++) {
+        for (j = 0; j < jogo.mapa.colunas; j++) {
+            c = jogo.mapa.objs[i][j];
+            if (c == jogo.mapa.tunel) {
+                tunel.tuneis[t][LINHA] = i;
+                tunel.tuneis[t][COLUNA] = j;
+                t += 1;
+            }
+        }
+    }
+
+    tunel.temTunel = t;
+
+    return tunel;
+}
+
+tJogo tunelizaCobra(tJogo jogo) {
+      int cabeca[2] = {jogo.cobra.corpo[CABECA][LINHA], jogo.cobra.corpo[CABECA][COLUNA]};
+      int tunelOpostoIndex = pegaTunelOposto(jogo, cabeca[LINHA], cabeca[COLUNA]);
+      int direcao = jogo.cobra.direcao;
+      jogo.cobra.corpo[CABECA][LINHA] = jogo.tunel.tuneis[tunelOpostoIndex][LINHA];
+      jogo.cobra.corpo[CABECA][COLUNA] = jogo.tunel.tuneis[tunelOpostoIndex][COLUNA];
+      jogo.cobra.corpo[CABECA][LINHA] += movimentos[direcao][LINHA];
+      jogo.cobra.corpo[CABECA][COLUNA] += movimentos[direcao][COLUNA];
+      return jogo;
+}
+
+int pegaTunelOposto(tJogo jogo, int x, int y) {
+    int i, j;
+
+    if(jogo.tunel.tuneis[0][LINHA] == x && jogo.tunel.tuneis[0][COLUNA] == y) {
+        return 1;
+    }
+
+    return 0;
+}
+
+int temTunel(tJogo jogo) {
+    return jogo.tunel.temTunel;
 }
 
 // Metodos referentes ao jogo
@@ -747,6 +820,7 @@ tJogo iniciaJogo(int argc, char *diretorio) {
                 .status = JOGANDO};
 
   strcpy(jogo.diretorio, diretorio);
+  jogo.tunel = inicializaTunel(jogo);
 
   return jogo;
 }
@@ -787,6 +861,10 @@ tJogo realizaMovimento(tJogo jogo, int movimento) {
 
   if (passouDoMapa(jogo.mapa, jogo.cobra)) {
     jogo.cobra = teleportaCobra(jogo.mapa, jogo.cobra);
+  }
+
+  if(entrouNoTunel(jogo)) {
+      jogo = tunelizaCobra(jogo);
   }
 
   char objeto = objetoDaCabeca(jogo.mapa, jogo.cobra);
