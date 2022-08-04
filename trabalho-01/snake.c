@@ -9,8 +9,8 @@
 // Bibliotecas
 
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 
 // Constantes globais
 
@@ -39,7 +39,6 @@
 #define RANKING_DIR "/ranking.txt"
 #define ESTATISTICAS_DIR "/estatisticas.txt"
 #define HEATMAPA_DIR "/heatmap.txt"
-
 
 const char direcoes[4] = {'^', '>', 'v', '<'};
 const int movimentos[4][2] = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
@@ -94,8 +93,8 @@ typedef struct {
 } tCobra;
 
 typedef struct {
-    int tuneis[TAM_TUNEL][2];
-    int temTunel;
+  int tuneis[TAM_TUNEL][2];
+  int temTunel;
 } tTunel;
 
 typedef struct {
@@ -190,17 +189,17 @@ int main(int argc, char *argv[]) {
 
   geraInicializacao(jogo);
 
-  //FILE *temp = fopen("./saida/resumo.txt", "w");
-  //fclose(temp);
+  // FILE *temp = fopen("./saida/resumo.txt", "w");
+  // fclose(temp);
 
   while (scanf("%c", &movimento) == 1) {
-    system("clear");
+    // system("clear");
     jogo = realizaMovimento(jogo, movimento);
     if (terminouJogo(jogo)) {
       break;
     }
     scanf("%*c");
-    usleep(70000);
+    // usleep(70000);
   }
 
   // geraResumo(jogo);
@@ -215,7 +214,7 @@ int main(int argc, char *argv[]) {
 
 tMapa carregaMapa(char *diretorio) {
   int i, j;
-  char obj, path[TAM_DIRETORIO*2] = "";
+  char obj, path[TAM_DIRETORIO * 2] = "";
   tMapa mapa = {.direcoes = {'^', '>', 'v', '<'},
                 .vazio = ' ',
                 .parede = '#',
@@ -386,7 +385,7 @@ int temComida(tMapa mapa) {
 // Metodos para o resumo
 
 void resumeGerouDinheiro(tJogo jogo, int movimento) {
-  char path[TAM_DIRETORIO*2] = "";
+  char path[TAM_DIRETORIO * 2] = "";
 
   strcat(path, jogo.diretorio);
   strcat(path, SAIDA_DIR);
@@ -405,7 +404,7 @@ void resumeGerouDinheiro(tJogo jogo, int movimento) {
 }
 
 void resumeCrescimentoCobraSemTerminar(tJogo jogo, int movimento) {
-  char path[TAM_DIRETORIO*2] = "";
+  char path[TAM_DIRETORIO * 2] = "";
 
   strcat(path, jogo.diretorio);
   strcat(path, SAIDA_DIR);
@@ -424,7 +423,7 @@ void resumeCrescimentoCobraSemTerminar(tJogo jogo, int movimento) {
 }
 
 void resumeCrescimentoCobraTerminandoJogo(tJogo jogo, int movimento) {
-  char path[TAM_DIRETORIO*2] = "";
+  char path[TAM_DIRETORIO * 2] = "";
 
   strcat(path, jogo.diretorio);
   strcat(path, SAIDA_DIR);
@@ -445,7 +444,7 @@ void resumeCrescimentoCobraTerminandoJogo(tJogo jogo, int movimento) {
 }
 
 void resumeFimDeJogoPorColisao(tJogo jogo, int movimento) {
-  char path[TAM_DIRETORIO*2] = "";
+  char path[TAM_DIRETORIO * 2] = "";
 
   strcat(path, jogo.diretorio);
   strcat(path, SAIDA_DIR);
@@ -470,7 +469,7 @@ tHeatMapa inicializaHeatMapa(char *diretorio) {
   int i, j;
   tHeatMapa heatMapa;
 
-  char path[TAM_DIRETORIO*2] = "";
+  char path[TAM_DIRETORIO * 2] = "";
 
   strcat(path, diretorio);
   strcat(path, MAPA_DIR);
@@ -722,9 +721,10 @@ int passouDoMapa(tMapa mapa, tCobra cobra) {
 }
 
 int entrouNoTunel(tJogo jogo) {
-  int cabeca[2] = {jogo.cobra.corpo[CABECA][LINHA], jogo.cobra.corpo[CABECA][COLUNA]};
-  if(jogo.mapa.objs[cabeca[LINHA]][cabeca[COLUNA]] == jogo.mapa.tunel) {
-      return 1;
+  int cabeca[2] = {jogo.cobra.corpo[CABECA][LINHA],
+                   jogo.cobra.corpo[CABECA][COLUNA]};
+  if (jogo.mapa.objs[cabeca[LINHA]][cabeca[COLUNA]] == jogo.mapa.tunel) {
+    return 1;
   }
 
   return 0;
@@ -754,50 +754,50 @@ tCobra teleportaCobra(tMapa mapa, tCobra cobra) {
 // Metodos referentes ao tunel
 
 tTunel inicializaTunel(tJogo jogo) {
-    tTunel tunel;
-    int t = 0, i, j;
-    char c;
+  tTunel tunel;
+  int t = 0, i, j;
+  char c;
 
-    for (i = 0; i < jogo.mapa.linhas; i++) {
-        for (j = 0; j < jogo.mapa.colunas; j++) {
-            c = jogo.mapa.objs[i][j];
-            if (c == jogo.mapa.tunel) {
-                tunel.tuneis[t][LINHA] = i;
-                tunel.tuneis[t][COLUNA] = j;
-                t += 1;
-            }
-        }
+  for (i = 0; i < jogo.mapa.linhas; i++) {
+    for (j = 0; j < jogo.mapa.colunas; j++) {
+      c = jogo.mapa.objs[i][j];
+      if (c == jogo.mapa.tunel) {
+        tunel.tuneis[t][LINHA] = i;
+        tunel.tuneis[t][COLUNA] = j;
+        t += 1;
+      }
     }
+  }
 
-    tunel.temTunel = t;
+  tunel.temTunel = t;
 
-    return tunel;
+  return tunel;
 }
 
 tJogo tunelizaCobra(tJogo jogo) {
-      int cabeca[2] = {jogo.cobra.corpo[CABECA][LINHA], jogo.cobra.corpo[CABECA][COLUNA]};
-      int tunelOpostoIndex = pegaTunelOposto(jogo, cabeca[LINHA], cabeca[COLUNA]);
-      int direcao = jogo.cobra.direcao;
-      jogo.cobra.corpo[CABECA][LINHA] = jogo.tunel.tuneis[tunelOpostoIndex][LINHA];
-      jogo.cobra.corpo[CABECA][COLUNA] = jogo.tunel.tuneis[tunelOpostoIndex][COLUNA];
-      jogo.cobra.corpo[CABECA][LINHA] += movimentos[direcao][LINHA];
-      jogo.cobra.corpo[CABECA][COLUNA] += movimentos[direcao][COLUNA];
-      return jogo;
+  int cabeca[2] = {jogo.cobra.corpo[CABECA][LINHA],
+                   jogo.cobra.corpo[CABECA][COLUNA]};
+  int tunelOpostoIndex = pegaTunelOposto(jogo, cabeca[LINHA], cabeca[COLUNA]);
+  int direcao = jogo.cobra.direcao;
+  jogo.cobra.corpo[CABECA][LINHA] = jogo.tunel.tuneis[tunelOpostoIndex][LINHA];
+  jogo.cobra.corpo[CABECA][COLUNA] =
+      jogo.tunel.tuneis[tunelOpostoIndex][COLUNA];
+  jogo.cobra.corpo[CABECA][LINHA] += movimentos[direcao][LINHA];
+  jogo.cobra.corpo[CABECA][COLUNA] += movimentos[direcao][COLUNA];
+  return jogo;
 }
 
 int pegaTunelOposto(tJogo jogo, int x, int y) {
-    int i, j;
+  int i, j;
 
-    if(jogo.tunel.tuneis[0][LINHA] == x && jogo.tunel.tuneis[0][COLUNA] == y) {
-        return 1;
-    }
+  if (jogo.tunel.tuneis[0][LINHA] == x && jogo.tunel.tuneis[0][COLUNA] == y) {
+    return 1;
+  }
 
-    return 0;
+  return 0;
 }
 
-int temTunel(tJogo jogo) {
-    return jogo.tunel.temTunel;
-}
+int temTunel(tJogo jogo) { return jogo.tunel.temTunel; }
 
 // Metodos referentes ao jogo
 
@@ -863,8 +863,8 @@ tJogo realizaMovimento(tJogo jogo, int movimento) {
     jogo.cobra = teleportaCobra(jogo.mapa, jogo.cobra);
   }
 
-  if(entrouNoTunel(jogo)) {
-      jogo = tunelizaCobra(jogo);
+  if (entrouNoTunel(jogo)) {
+    jogo = tunelizaCobra(jogo);
   }
 
   char objeto = objetoDaCabeca(jogo.mapa, jogo.cobra);
@@ -945,7 +945,7 @@ int terminouJogo(tJogo jogo) {
 
 void geraInicializacao(tJogo jogo) {
   int i, j;
-  char path[TAM_DIRETORIO*2] = "";
+  char path[TAM_DIRETORIO * 2] = "";
 
   strcat(path, jogo.diretorio);
   strcat(path, SAIDA_DIR);
@@ -981,7 +981,7 @@ void geraResumo(tJogo jogo) {
 
 void geraRanking(tJogo jogo) {
   int i;
-  char path[TAM_DIRETORIO*2] = "";
+  char path[TAM_DIRETORIO * 2] = "";
 
   strcat(path, jogo.diretorio);
   strcat(path, SAIDA_DIR);
@@ -1004,7 +1004,7 @@ void geraRanking(tJogo jogo) {
 }
 
 void geraEstatistica(tJogo jogo) {
-  char path[TAM_DIRETORIO*2] = "";
+  char path[TAM_DIRETORIO * 2] = "";
 
   strcat(path, jogo.diretorio);
   strcat(path, SAIDA_DIR);
@@ -1034,7 +1034,7 @@ void geraEstatistica(tJogo jogo) {
 
 void geraHeatMapa(tJogo jogo) {
   int i, j;
-  char path[TAM_DIRETORIO*2] = "";
+  char path[TAM_DIRETORIO * 2] = "";
 
   strcat(path, jogo.diretorio);
   strcat(path, SAIDA_DIR);
