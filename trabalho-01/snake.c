@@ -189,9 +189,6 @@ int main(int argc, char *argv[]) {
 
   geraInicializacao(jogo);
 
-  // FILE *temp = fopen("./saida/resumo.txt", "w");
-  // fclose(temp);
-
   while (scanf("%c", &movimento) == 1) {
     // system("clear");
     jogo = realizaMovimento(jogo, movimento);
@@ -1036,6 +1033,8 @@ void geraHeatMapa(tJogo jogo) {
   int i, j;
   char path[TAM_DIRETORIO * 2] = "";
 
+  // Cria uma string para o diretorio
+  // <diretorio-informado>/saida/heatmap.txt
   strcat(path, jogo.diretorio);
   strcat(path, SAIDA_DIR);
   strcat(path, HEATMAPA_DIR);
@@ -1043,14 +1042,21 @@ void geraHeatMapa(tJogo jogo) {
   FILE *arquivo = fopen(path, "w");
 
   if (!arquivo) {
+    // Nao foi possivel abrir o arquivo
+    // Provalmente nao existe a pasta saida
+    // Crie a pasta saida no diretorio informado
     printf("Nao foi possivel abrir o arquivo %s\n", path);
     exit(0);
   }
 
-  for (i = 0; i < jogo.heatMapa.linhas; i++) {
-    for (j = 0; j < jogo.heatMapa.colunas; j++) {
+  int l = jogo.heatMapa.linhas;
+  int c = jogo.heatMapa.colunas;
+
+  // Gera o arquivo heatmap.txt com os valores
+  for (i = 0; i < l; i++) {
+    for (j = 0; j < c; j++) {
       fprintf(arquivo, "%d", jogo.heatMapa.objs[i][j]);
-      if (j < jogo.heatMapa.colunas - 1) {
+      if (j < c - 1) {
         fprintf(arquivo, " ");
       }
     }
