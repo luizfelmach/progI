@@ -55,7 +55,7 @@
  */
 
 typedef struct {
-    int movs[4][2];
+  int movs[4][2];
 } tMovimentos;
 
 typedef struct {
@@ -412,9 +412,7 @@ int procuraComidaMapa(tMapa mapa) {
 
   return quantidadeDeComida;
 }
-int temComida(tMapa mapa) {
-    return mapa.qtdComida;
-}
+int temComida(tMapa mapa) { return mapa.qtdComida; }
 
 int linhasMapa(tMapa mapa) { return mapa.linhas; }
 
@@ -717,7 +715,8 @@ tJogo movimentaCobra(tJogo jogo, int movimento) {
   movimento = proximaDirecao(movimento, jogo.cobra.direcao);
 
   // Armazena a cauda ou uma parte do corpo anterior ate chegar na cauda
-  int cauda[2] = {jogo.cobra.corpo[CABECA][LINHA], jogo.cobra.corpo[CABECA][COLUNA]};
+  int cauda[2] = {jogo.cobra.corpo[CABECA][LINHA],
+                  jogo.cobra.corpo[CABECA][COLUNA]};
 
   // Faz o movimento da cabeca da cobra
   jogo.cobra.corpo[CABECA][LINHA] += moveX(jogo.movimentos, movimento);
@@ -758,13 +757,15 @@ tCobra aumentaCobra(tCobra cobra) {
 
 int passouDoMapa(tJogo jogo) {
   // Pega as coordenadas da cabeca
-  int cabeca[2] = {jogo.cobra.corpo[CABECA][LINHA], jogo.cobra.corpo[CABECA][COLUNA]};
+  int cabeca[2] = {jogo.cobra.corpo[CABECA][LINHA],
+                   jogo.cobra.corpo[CABECA][COLUNA]};
 
   // Retorna verdadeiro caso tenha passado do mapa
   if (cabeca[LINHA] < 0 || cabeca[COLUNA] < 0) {
     return 1;
   }
-  if (cabeca[LINHA] >= jogo.mapa.linhas || cabeca[COLUNA] >= jogo.mapa.colunas) {
+  if (cabeca[LINHA] >= jogo.mapa.linhas ||
+      cabeca[COLUNA] >= jogo.mapa.colunas) {
     return 1;
   }
 
@@ -853,18 +854,16 @@ int temTunel(tJogo jogo) { return jogo.tunel.temTunel; }
 // Metodos referentes ao tipo movimentos
 
 tMovimentos inicializaMovimentos() {
-    tMovimentos movimentos = {
-        .movs = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}}
-    };
-    return movimentos;
+  tMovimentos movimentos = {.movs = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}}};
+  return movimentos;
 }
 
 int moveX(tMovimentos movimentos, int movimento) {
-    return movimentos.movs[movimento][LINHA];
+  return movimentos.movs[movimento][LINHA];
 }
 
 int moveY(tMovimentos movimentos, int movimento) {
-    return movimentos.movs[movimento][COLUNA];
+  return movimentos.movs[movimento][COLUNA];
 }
 
 // Metodos referentes ao jogo
@@ -942,7 +941,6 @@ tJogo realizaMovimento(tJogo jogo, int movimento) {
     jogo.heatMapa = rastreiaMovimento(jogo.heatMapa, jogo.cobra);
     jogo.ranking = atualizaRanking(jogo);
     resumeFimDeJogoPorColisao(jogo, movimento);
-
   }
 
   if (colidiuComACobra(jogo.cobra)) {
@@ -950,7 +948,6 @@ tJogo realizaMovimento(tJogo jogo, int movimento) {
     jogo.heatMapa = rastreiaMovimento(jogo.heatMapa, jogo.cobra);
     jogo.ranking = atualizaRanking(jogo);
     resumeFimDeJogoPorColisao(jogo, movimento);
-
   }
 
   if (ganhouDinheiro(jogo)) {
@@ -964,7 +961,7 @@ tJogo realizaMovimento(tJogo jogo, int movimento) {
     jogo = comeComida(jogo);
 
     if (temComida(jogo.mapa)) {
-        resumeCrescimentoCobraSemTerminar(jogo, movimento);
+      resumeCrescimentoCobraSemTerminar(jogo, movimento);
     }
   }
 
@@ -986,13 +983,13 @@ tJogo realizaMovimento(tJogo jogo, int movimento) {
 }
 
 tJogo comeComida(tJogo jogo) {
-    jogo.mapa.qtdComida -= 1;
-    return jogo;
+  jogo.mapa.qtdComida -= 1;
+  return jogo;
 }
 
 int colidiuComAParede(tJogo jogo) {
-    char objeto = objetoDaCabeca(jogo.mapa, jogo.cobra);
-    return objeto == jogo.mapa.parede;
+  char objeto = objetoDaCabeca(jogo.mapa, jogo.cobra);
+  return objeto == jogo.mapa.parede;
 }
 
 int colidiuComACobra(tCobra cobra) {
@@ -1012,13 +1009,13 @@ int colidiuComACobra(tCobra cobra) {
   return colisao;
 }
 int ganhouDinheiro(tJogo jogo) {
-    char objeto = objetoDaCabeca(jogo.mapa, jogo.cobra);
-    return objeto == jogo.mapa.dinheiro;
+  char objeto = objetoDaCabeca(jogo.mapa, jogo.cobra);
+  return objeto == jogo.mapa.dinheiro;
 }
 
 int comeuComida(tJogo jogo) {
-    char objeto = objetoDaCabeca(jogo.mapa, jogo.cobra);
-    return objeto == jogo.mapa.comida;
+  char objeto = objetoDaCabeca(jogo.mapa, jogo.cobra);
+  return objeto == jogo.mapa.comida;
 }
 
 void perdeJogo(tJogo jogo) {
@@ -1052,13 +1049,13 @@ void imprimeEstadoAtual(tJogo jogo, int movimento) {
 }
 
 tJogo defineStatusJogo(tJogo jogo, int status) {
-    jogo.status = status;
-    return jogo;
+  jogo.status = status;
+  return jogo;
 }
 
 tJogo contaJogadaJogo(tJogo jogo) {
-    jogo.jogada += 1;
-    return jogo;
+  jogo.jogada += 1;
+  return jogo;
 }
 
 int terminouJogo(tJogo jogo) {
