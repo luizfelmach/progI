@@ -40,9 +40,6 @@
 #define ESTATISTICAS_DIR "/estatisticas.txt"
 #define HEATMAPA_DIR "/heatmap.txt"
 
-const char direcoes[4] = {'^', '>', 'v', '<'};
-const int movimentos[4][2] = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
-
 /*
  * Estruturas para o jogo
  *
@@ -53,8 +50,13 @@ const int movimentos[4][2] = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
  *      tEstatisticas -> Armazena as estatisticas do jogo
  *      tRanking -> Armazena o tipo ranking
  *      tTunel -> Armazena as informacoes do tipo tunel
+ *      tMovimentos -> Armazena as informacoes para o tipo movimento
  *
  */
+
+typedef struct {
+    int movs[4][2];
+} tMovimentos;
 
 typedef struct {
   char objs[TAM_MAPA][TAM_MAPA];
@@ -104,6 +106,7 @@ typedef struct {
   tRanking ranking;
   tCobra cobra;
   tTunel tunel;
+  tMovimentos movimentos;
   char diretorio[TAM_DIRETORIO];
   int jogada;
   int pontuacao;
@@ -164,7 +167,7 @@ int valorPontoRanking(tJogo jogo, int alvo);
 // Metodos referentes a cobra
 
 tCobra inicializaCobra(tMapa mapa);
-tCobra movimentaCobra(tCobra cobra, int movimento);
+tJogo movimentaCobra(tJogo jogo, int movimento);
 tCobra aumentaCobra(tCobra cobra);
 tCobra teleportaCobra(tMapa mapa, tCobra cobra);
 
@@ -174,6 +177,12 @@ tTunel inicializaTunel(tJogo jogo);
 tJogo tunelizaCobra(tJogo jogo);
 int pegaTunelOposto(tJogo jogo, int x, int y);
 int temTunel(tJogo jogo);
+
+// Metodos referentes ao tipo movimentos
+
+tMovimentos inicializaMovimentos();
+int moveX(tMovimentos movimentos, int movimento);
+int moveY(tMovimentos movimentos, int movimento);
 
 // Metodos referentes ao jogo
 
@@ -376,7 +385,7 @@ tMapa atualizaMapa(tMapa mapa, tCobra cobra) {
   }
 
   // Atualiza a direcao da cabeca
-  mapa.objs[l][c] = direcoes[cobra.direcao];
+  mapa.objs[l][c] = mapa.direcoes[cobra.direcao];
 
   return mapa;
 }
@@ -703,37 +712,37 @@ tCobra inicializaCobra(tMapa mapa) {
   return cobra;
 }
 
-tCobra movimentaCobra(tCobra cobra, int movimento) {
+tJogo movimentaCobra(tJogo jogo, int movimento) {
   int i, aux[2];
 
   // Pega a nova direcao da cabeca de acordo com o movimento
-  movimento = proximaDirecao(movimento, cobra.direcao);
+  movimento = proximaDirecao(movimento, jogo.cobra.direcao);
 
   // Armazena a cauda ou uma parte do corpo anterior ate chegar na cauda
-  int cauda[2] = {cobra.corpo[CABECA][LINHA], cobra.corpo[CABECA][COLUNA]};
+  int cauda[2] = {jogo.cobra.corpo[CABECA][LINHA], jogo.cobra.corpo[CABECA][COLUNA]};
 
   // Faz o movimento da cabeca da cobra
-  cobra.corpo[CABECA][LINHA] += movimentos[movimento][LINHA];
-  cobra.corpo[CABECA][COLUNA] += movimentos[movimento][COLUNA];
+  jogo.cobra.corpo[CABECA][LINHA] += moveX(jogo.movimentos, movimento);
+  jogo.cobra.corpo[CABECA][COLUNA] += moveY(jogo.movimentos, movimento);
 
   // Movimenta o restante do corpo
   for (i = 1; i < TAM_COBRA; i++) {
-    if (cobra.corpo[i][LINHA] != -1) {
-      aux[LINHA] = cobra.corpo[i][LINHA];
-      aux[COLUNA] = cobra.corpo[i][COLUNA];
-      cobra.corpo[i][LINHA] = cauda[LINHA];
-      cobra.corpo[i][COLUNA] = cauda[COLUNA];
+    if (jogo.cobra.corpo[i][LINHA] != -1) {
+      aux[LINHA] = jogo.cobra.corpo[i][LINHA];
+      aux[COLUNA] = jogo.cobra.corpo[i][COLUNA];
+      jogo.cobra.corpo[i][LINHA] = cauda[LINHA];
+      jogo.cobra.corpo[i][COLUNA] = cauda[COLUNA];
       cauda[LINHA] = aux[LINHA];
       cauda[COLUNA] = aux[COLUNA];
     }
   }
 
   // Atualiza a cauda e a ultima direcao
-  cobra.cauda[LINHA] = cauda[LINHA];
-  cobra.cauda[COLUNA] = cauda[COLUNA];
-  cobra.direcao = movimento;
+  jogo.cobra.cauda[LINHA] = cauda[LINHA];
+  jogo.cobra.cauda[COLUNA] = cauda[COLUNA];
+  jogo.cobra.direcao = movimento;
 
-  return cobra;
+  return jogo;
 }
 
 tCobra aumentaCobra(tCobra cobra) {
@@ -826,8 +835,8 @@ tJogo tunelizaCobra(tJogo jogo) {
   jogo.cobra.corpo[CABECA][LINHA] = jogo.tunel.tuneis[tunelOpostoIndex][LINHA];
   jogo.cobra.corpo[CABECA][COLUNA] =
       jogo.tunel.tuneis[tunelOpostoIndex][COLUNA];
-  jogo.cobra.corpo[CABECA][LINHA] += movimentos[direcao][LINHA];
-  jogo.cobra.corpo[CABECA][COLUNA] += movimentos[direcao][COLUNA];
+  jogo.cobra.corpo[CABECA][LINHA] += moveX(jogo.movimentos, direcao);
+  jogo.cobra.corpo[CABECA][COLUNA] += moveY(jogo.movimentos, direcao);
   return jogo;
 }
 
@@ -842,6 +851,23 @@ int pegaTunelOposto(tJogo jogo, int x, int y) {
 }
 
 int temTunel(tJogo jogo) { return jogo.tunel.temTunel; }
+
+// Metodos referentes ao tipo movimentos
+
+tMovimentos inicializaMovimentos() {
+    tMovimentos movimentos = {
+        .movs = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}}
+    };
+    return movimentos;
+}
+
+int moveX(tMovimentos movimentos, int movimento) {
+    return movimentos.movs[movimento][LINHA];
+}
+
+int moveY(tMovimentos movimentos, int movimento) {
+    return movimentos.movs[movimento][COLUNA];
+}
 
 // Metodos referentes ao jogo
 
@@ -859,6 +885,7 @@ tJogo iniciaJogo(int argc, char *diretorio) {
                 .estatisticas = inicializaEstatisticas(),
                 .cobra = inicializaCobra(jogo.mapa),
                 .ranking = inicializaRanking(),
+                .movimentos = inicializaMovimentos(),
                 .pontuacao = 0,
                 .jogada = 0,
                 .status = JOGANDO};
@@ -902,7 +929,7 @@ tJogo realizaMovimento(tJogo jogo, int movimento) {
   jogo.estatisticas = contaMovimentoDirecionado(
       jogo.estatisticas, proximaDirecao(movimento, jogo.cobra.direcao));
   jogo = contaJogadaJogo(jogo);
-  jogo.cobra = movimentaCobra(jogo.cobra, movimento);
+  jogo = movimentaCobra(jogo, movimento);
 
   if (passouDoMapa(jogo)) {
     jogo.cobra = teleportaCobra(jogo.mapa, jogo.cobra);
