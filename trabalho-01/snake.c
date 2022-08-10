@@ -883,13 +883,13 @@ tJogo iniciaJogo(int argc, char *diretorio) {
                 .estatisticas = inicializaEstatisticas(),
                 .cobra = inicializaCobra(jogo.mapa),
                 .ranking = inicializaRanking(),
+                .tunel = inicializaTunel(jogo),
                 .movimentos = inicializaMovimentos(),
                 .pontuacao = 0,
                 .jogada = 0,
                 .status = JOGANDO};
 
   strcpy(jogo.diretorio, diretorio);
-  jogo.tunel = inicializaTunel(jogo);
 
   return jogo;
 }
