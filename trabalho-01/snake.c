@@ -229,7 +229,6 @@ int main(int argc, char *argv[]) {
     // usleep(70000);
   }
 
-  // geraResumo(jogo);
   geraRanking(jogo);
   geraEstatistica(jogo);
   geraHeatMapa(jogo);
