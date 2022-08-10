@@ -204,7 +204,6 @@ tJogo defineStatusJogo(tJogo jogo, int status);
 tJogo contaJogadaJogo(tJogo jogo);
 int terminouJogo(tJogo jogo);
 void geraInicializacao(tJogo jogo);
-void geraResumo(tJogo jogo);
 void geraRanking(tJogo jogo);
 void geraEstatistica(tJogo jogo);
 void geraHeatMapa(tJogo jogo);
@@ -1108,11 +1107,6 @@ void geraInicializacao(tJogo jogo) {
   fprintf(arquivo, "A cobra comecara o jogo na linha %d e coluna %d\n", cabecaL,
           cabecaC);
 
-  fclose(arquivo);
-}
-
-void geraResumo(tJogo jogo) {
-  FILE *arquivo = fopen("./saida/resumo.txt", "w");
   fclose(arquivo);
 }
 
