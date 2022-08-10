@@ -541,6 +541,7 @@ tHeatMapa rastreiaMovimento(tHeatMapa heatMapa, tCobra cobra) {
 }
 
 int linhasHeatMapa(tJogo jogo) { return jogo.heatMapa.linhas; }
+
 int colunasHeatMapa(tJogo jogo) { return jogo.heatMapa.colunas; }
 
 int valorDaCelulaHeatMapa(tJogo jogo, int x, int y) {
