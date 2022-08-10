@@ -373,13 +373,13 @@ tMapa atualizaMapa(tMapa mapa, tCobra cobra) {
     if (cobra.corpo[i][LINHA] != -1) {
       linha = cobra.corpo[i][LINHA];
       coluna = cobra.corpo[i][COLUNA];
-      mapa.objs[linha][coluna] = 'o';
+      mapa.objs[linha][coluna] = mapa.corpo;
     }
   }
 
   // Se a cauda existir, apague
   if (cauda[LINHA] != -1) {
-    mapa.objs[cauda[LINHA]][cauda[COLUNA]] = ' ';
+    mapa.objs[cauda[LINHA]][cauda[COLUNA]] = mapa.vazio;
   }
 
   // Atualiza a direcao da cabeca
